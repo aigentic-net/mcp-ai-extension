@@ -1,10 +1,60 @@
 """
 Response formatter utilities for AI extension Tool - Extension Version
-Simplified version without UI dependencies
 """
 
 from typing import List, Dict, Any, Tuple, Union
 from mcp.types import TextContent
+
+
+def format_extension_response(
+    text: str,
+    attached_files: List[str] = None,
+    workspace: str = None,
+    continue_chat: bool = False
+) -> str:
+    """Format response in AI Interactive Tool style but with extension tags"""
+    response_parts = []
+    
+    # Add text content
+    response_parts.append(text)
+    response_parts.append("")  # Empty line after text
+    
+    # Add attached files if any
+    if attached_files:
+        response_parts.append("<AI_EXTENSION_ATTACHED_FILES>")
+        
+        # Group by folders and files
+        folders = []
+        files = []
+        for path in attached_files:
+            if path.endswith('/'):
+                folders.append(path)
+            else:
+                files.append(path)
+                
+        if folders:
+            response_parts.append("FOLDERS:")
+            for folder in folders:
+                response_parts.append(f"- {folder}")
+            response_parts.append("")
+            
+        if files:
+            response_parts.append("FILES:")
+            for file in files:
+                response_parts.append(f"- {file}")
+                
+        response_parts.append("</AI_EXTENSION_ATTACHED_FILES>")
+        response_parts.append("")
+        
+    # Add workspace if files are attached
+    if attached_files and workspace:
+        response_parts.append(f"<AI_EXTENSION_WORKSPACE>{workspace}</AI_EXTENSION_WORKSPACE>")
+        response_parts.append("")
+        
+    # Add continue chat tag
+    response_parts.append(f"<AI_EXTENSION_CONTINUE_CHAT>{str(continue_chat).lower()}</AI_EXTENSION_CONTINUE_CHAT>")
+    
+    return "\n".join(response_parts)
 
 
 def format_text_only_response(text_content: str) -> List[TextContent]:
@@ -22,7 +72,7 @@ def format_text_only_response(text_content: str) -> List[TextContent]:
 
 def format_mixed_response(response_data: Dict[str, Any]) -> List[Union[TextContent]]:
     """
-    Format mixed response (for compatibility, but extension mode uses text-only)
+    Format mixed response with extension tags
     
     Args:
         response_data: Dictionary containing response data
@@ -30,8 +80,13 @@ def format_mixed_response(response_data: Dict[str, Any]) -> List[Union[TextConte
     Returns:
         List containing TextContent object
     """
-    text_content = response_data.get('text_content', '')
-    return format_text_only_response(text_content)
+    formatted_text = format_extension_response(
+        text=response_data.get('text', ''),
+        attached_files=response_data.get('attached_files'),
+        workspace=response_data.get('workspace'),
+        continue_chat=response_data.get('continue_chat', False)
+    )
+    return format_text_only_response(formatted_text)
 
 
 def build_error_response(error_message: str) -> List[TextContent]:

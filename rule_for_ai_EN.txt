@@ -1,13 +1,13 @@
 🚀 AI extension RULES - OPTIMIZED 🚀
 ===============================================================================
 📋 CORE WORKFLOW (3 Essential Steps):
-1️⃣ READ ai_extension output tags → Extract AI_extension_CONTINUE_CHAT status  
+1️⃣ READ AI_EXTENSION output tags → Extract AI_EXTENSION_CONTINUE_CHAT status  
 2️⃣ APPLY ENHANCED THINKING → Always use detailed thinking blocks for all responses
-3️⃣ FOLLOW CONTINUE DIRECTIVE → Call ai_extension tool again if AI_extension_CONTINUE_CHAT=true (MANDATORY)
+3️⃣ FOLLOW CONTINUE DIRECTIVE → Call AI_EXTENSION tool again if AI_EXTENSION_CONTINUE_CHAT=true (MANDATORY)
 
 🎯 FUNDAMENTAL BEHAVIORS:
-✅ Think before every action - all ai_extension responses require thinking blocks
-✅ Always honor AI_extension_CONTINUE_CHAT=true (MANDATORY callback)
+✅ Think before every action - all AI_EXTENSION responses require thinking blocks
+✅ Always honor AI_EXTENSION_CONTINUE_CHAT=true (MANDATORY callback)
 ✅ Always respond in English language
 ✅ Always apply high-level reasoning and analysis
 ===============================================================================
@@ -17,10 +17,10 @@
 📌 SYNTAX: Use <thinking> and </thinking>
 
 📌 MANDATORY USAGE:
-✅ REQUIRED for ALL responses through ai_extension tool
+✅ REQUIRED for ALL responses through AI_EXTENSION tool
 ✅ Always at start of response - minimum 1 detailed thinking block
 ✅ Additional blocks for complex multi-step analysis
-✅ NOT required for regular chat outside ai_extension tool
+✅ NOT required for regular chat outside AI_EXTENSION tool
 
 📌 THINKING QUALITY STANDARDS:
 - Authentic analytical reasoning (not performative)
@@ -33,10 +33,10 @@
 🔧 TAG SYSTEM & ATTACHMENT PROCESSING 🔧
 ===============================================================================
 📌 CONTROL TAG PROCESSING:
-✅ <AI_extension_CONTINUE_CHAT>true</AI_extension_CONTINUE_CHAT>
-   → MANDATORY: Must call ai_extension tool again immediately
+✅ <AI_EXTENSION_CONTINUE_CHAT>true</AI_EXTENSION_CONTINUE_CHAT>
+   → MANDATORY: Must call AI_EXTENSION tool again immediately
 
-✅ <AI_extension_ATTACHED_FILES> + <AI_extension_WORKSPACE>
+✅ <AI_EXTENSION_ATTACHED_FILES> + <AI_EXTENSION_WORKSPACE>
    → Process file/folder attachments with proper workspace context
 
 📌 DUAL ATTACHMENT SYSTEM:
@@ -60,7 +60,7 @@
 💡 OPTIMIZED PRINCIPLES 💡
 ===============================================================================
 1. **THINK STRATEGICALLY**: Every action requires purposeful reasoning
-2. **CONTINUE RELIABLY**: Follow AI_extension_CONTINUE_CHAT=true absolutely  
+2. **CONTINUE RELIABLY**: Follow AI_EXTENSION_CONTINUE_CHAT=true absolutely  
 3. **DELIVER QUALITY**: Always apply best cognitive effort and analysis
 4. **COMMUNICATE CLEARLY**: Use English consistently and professionally
 5. **PROCESS INTELLIGENTLY**: Handle dual attachments (files + images) appropriately

@@ -13,7 +13,7 @@ from .response_formatter import (
 )
 
 
-def ai_extension_tool(
+def AI_EXTENSION_tool(
     message: str = "",
     attached_files: List[str] = None,
     attached_images: List[str] = None,

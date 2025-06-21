@@ -80,7 +80,7 @@ def test_mcp_direct():
                 "id": 3,
                 "method": method,
                 "params": {
-                    "name": "ai_extension_tool",
+                    "name": "AI_EXTENSION_tool",
                     "arguments": {
                         "random_string": "test"
                     }

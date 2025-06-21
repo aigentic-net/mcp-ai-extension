@@ -22,7 +22,7 @@
 pip install -r requirements.txt
 
 # Run the tool directly
-python -m ai_extension_tool
+python -m AI_EXTENSION_tool
 ```
 
 ### Usage with MCP
@@ -34,7 +34,7 @@ Add to your MCP client configuration:
   "mcpServers": {
     "ai-extension": {
       "command": "python",
-      "args": ["-m", "ai_extension_tool"],
+      "args": ["-m", "AI_EXTENSION_tool"],
       "cwd": "/path/to/mcp-ai-extension"
     }
   }
@@ -94,7 +94,7 @@ The tool automatically saves your preferences:
 The tool outputs structured data for AI processing:
 
 ```python
-# Call "ai_extension" to launch the UI
+# Call "AI_EXTENSION" to launch the UI
 ```
 
 #### With File Attachments
@@ -102,7 +102,7 @@ The tool outputs structured data for AI processing:
 ```
 Your message content
 
-<AI_extension_ATTACHED_FILES>
+<AI_EXTENSION_ATTACHED_FILES>
 FOLDERS:
 - src/components
 
@@ -110,10 +110,10 @@ FILES:
 - src/utils/helper.js
 - config/settings.json
 
-</AI_extension_ATTACHED_FILES>
+</AI_EXTENSION_ATTACHED_FILES>
 
-<AI_extension_WORKSPACE>my-project</AI_extension_WORKSPACE>
-<AI_extension_CONTINUE_CHAT>true/false</AI_extension_CONTINUE_CHAT>
+<AI_EXTENSION_WORKSPACE>my-project</AI_EXTENSION_WORKSPACE>
+<AI_EXTENSION_CONTINUE_CHAT>true/false</AI_EXTENSION_CONTINUE_CHAT>
 ```
 
 #### With Images
@@ -124,7 +124,7 @@ When images are attached, they're included as base64 data in the response for AI
 
 ```
 mcp-ai-extension/
-├── ai_extension_tool/       # Main package
+├── AI_EXTENSION_tool/       # Main package
 │   ├── core/                  # Core functionality
 │   │   ├── dialog.py         # Main UI dialog
 │   │   ├── config.py         # Configuration management
@@ -151,7 +151,7 @@ mcp-ai-extension/
    ```
 
 2. **PyQt5 Issues**: Install PyQt5 system dependencies
-   - Try `python -m ai_extension_tool` instead
+   - Try `python -m AI_EXTENSION_tool` instead
 
 3. **Permission Errors**: Ensure write access to the project directory
 
@@ -161,7 +161,7 @@ mcp-ai-extension/
 
 Run with debug output:
 ```bash
-python -m ai_extension_tool --debug
+python -m AI_EXTENSION_tool --debug
 ```
 
 ## 🤝 Contributing

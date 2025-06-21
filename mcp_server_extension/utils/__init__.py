@@ -14,7 +14,7 @@ from .mcp_config import (
 from .mcp_client import (
     MCPClient,
     test_mcp_connection,
-    call_ai_extension_tool_via_mcp
+    call_AI_EXTENSION_tool_via_mcp
 )
 
 __all__ = [
@@ -31,5 +31,5 @@ __all__ = [
     'mcp_config_manager',
     'MCPClient',
     'test_mcp_connection',
-    'call_ai_extension_tool_via_mcp'
+    'call_AI_EXTENSION_tool_via_mcp'
 ] 

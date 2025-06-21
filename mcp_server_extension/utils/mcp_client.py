@@ -171,9 +171,9 @@ class MCPClient:
             print(f"[MCPClient] Error sending notification: {e}", file=sys.stderr)
             return False
     
-    def call_ai_extension_tool(self, dummy_param: str = "activate") -> Optional[List]:
+    def call_AI_EXTENSION_tool(self, dummy_param: str = "activate") -> Optional[List]:
         """
-        Call the ai_extension_tool function
+        Call the AI_EXTENSION_tool function
         
         Args:
             dummy_param: Dummy parameter (MCP tools require at least one parameter)
@@ -184,7 +184,7 @@ class MCPClient:
         response = self.send_request(
             "tools/call",
             {
-                "name": "ai_extension_tool",
+                "name": "AI_EXTENSION_tool",
                 "arguments": {
                     "random_string": dummy_param
                 }
@@ -297,7 +297,7 @@ def test_mcp_connection() -> bool:
         return False
 
 
-def test_ai_extension_tool() -> bool:
+def test_AI_EXTENSION_tool() -> bool:
     """
     Test calling the AI extension Tool
     
@@ -311,7 +311,7 @@ def test_ai_extension_tool() -> bool:
                 return False
             
             # Call the tool
-            result = client.call_ai_extension_tool("activate")
+            result = client.call_AI_EXTENSION_tool("activate")
             if result:
                 print(f"[MCPClient] Tool call successful! Result: {result}", file=sys.stderr)
                 return True
@@ -361,7 +361,7 @@ def test_mcp_connection_and_tools() -> bool:
             
             # Now test tool calling in the same session
             print("[MCPClient] Testing tool call in same session...", file=sys.stderr)
-            result = client.call_ai_extension_tool("activate")
+            result = client.call_AI_EXTENSION_tool("activate")
             if result:
                 print(f"[MCPClient] Tool call successful! Result: {result}", file=sys.stderr)
                 return True
@@ -374,7 +374,7 @@ def test_mcp_connection_and_tools() -> bool:
         return False
 
 
-def call_ai_extension_tool_via_mcp() -> Optional[List]:
+def call_AI_EXTENSION_tool_via_mcp() -> Optional[List]:
     """
     Call the AI extension Tool via MCP
     
@@ -387,7 +387,7 @@ def call_ai_extension_tool_via_mcp() -> Optional[List]:
                 print("[MCPClient] Failed to connect to server", file=sys.stderr)
                 return None
             
-            result = client.call_ai_extension_tool()
+            result = client.call_AI_EXTENSION_tool()
             return result
             
     except Exception as e:

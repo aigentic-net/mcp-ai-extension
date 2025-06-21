@@ -96,7 +96,7 @@ def test_mcp_step_by_step():
             "id": 3,
             "method": "tools/call",
             "params": {
-                "name": "ai_extension_tool",
+                "name": "AI_EXTENSION_tool",
                 "arguments": {
                     "random_string": "test"
                 }

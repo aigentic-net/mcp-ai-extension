@@ -14,7 +14,7 @@ Features:
 - Continue conversation functionality
 """
 
-from .description import AI_extension_DESCRIPTION
+from .description import AI_EXTENSION_DESCRIPTION
 
 __version__ = "2.2.0"
 __author__ = "DemonVN"
@@ -23,7 +23,7 @@ __description__ = "AI extension Tool - Advanced MCP Server with UI"
 
 # Core functionality
 from .core import (
-    ai_extension_tool,
+    AI_EXTENSION_tool,
     get_tool_description,
     InputDialog,
     ConfigManager,
@@ -63,7 +63,7 @@ from .utils import (
 # Export main components
 __all__ = [
     # Core
-    'ai_extension_tool',
+    'AI_EXTENSION_tool',
     'get_tool_description',
     'InputDialog',
     'ConfigManager', 
@@ -98,14 +98,14 @@ __all__ = [
     'mcp_config_manager',
     
     # Metadata
-    'AI_extension_DESCRIPTION',
+    'AI_EXTENSION_DESCRIPTION',
     '__version__',
     '__author__',
     '__email__',
     '__description__'
 ]
 
-def ai_extension():
+def AI_EXTENSION():
     """Entry point for the AI extension tool"""
-    from .core.mcp_handler import ai_extension_tool
-    return ai_extension_tool()
+    from .core.mcp_handler import AI_EXTENSION_tool
+    return AI_EXTENSION_tool()

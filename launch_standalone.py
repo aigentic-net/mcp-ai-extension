@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 def main():
     """Launch the AI extension Tool standalone UI"""
     try:
-        from ai_extension_tool.engine import run_ui
+        from AI_EXTENSION_tool.engine import run_ui
         print("Launching AI extension Tool...")
         result = run_ui()
         print("AI extension Tool closed.")

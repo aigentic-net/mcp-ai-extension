@@ -2,12 +2,12 @@ import argparse
 from mcp.server.fastmcp import FastMCP
 
 # Import from the core module using relative import
-from .core import ai_extension_tool, get_tool_description
+from .core import AI_EXTENSION_tool, get_tool_description
 
 def create_server():
     """Create and configure the MCP server instance"""
     mcp = FastMCP("AI extension Extension")
-    mcp.add_tool(ai_extension_tool, name="ai_extension_tool", description=get_tool_description())
+    mcp.add_tool(AI_EXTENSION_tool, name="AI_EXTENSION_tool", description=get_tool_description())
     return mcp
 
 def main():

@@ -74,7 +74,7 @@ class PasteImageTextEdit(QtWidgets.QTextEdit):
 class InputDialog(QtWidgets.QDialog):
     def __init__(self):
         super().__init__()
-        # Khởi tạo config manager
+        # Initialize config manager
         self.config_manager = ConfigManager()
         
         # Set responsive sizing instead of fixed
@@ -84,75 +84,75 @@ class InputDialog(QtWidgets.QDialog):
         saved_width, saved_height = self.config_manager.get_window_size()
         self.resize(saved_width, saved_height)
         
-        # Khởi tạo danh sách lưu đường dẫn file đính kèm
+        # Initialize attached files list
         self.attached_files = []
         
         # Initialize labels for compatibility (even though hidden)
         self.attached_files_label = QtWidgets.QLabel()  # Hidden label for compatibility
         self.attached_images_label = QtWidgets.QLabel()  # Hidden label for compatibility
         
-        # Lưu workspace state để reuse - load từ config
+        # Load workspace state from config
         last_workspace = self.config_manager.get_last_workspace()
         if last_workspace and os.path.exists(last_workspace):
             self.current_workspace_path = last_workspace
             self.current_workspace_name = self.config_manager.get_last_workspace_name()
-            # Load attached files từ config
+            # Load attached files from config
             saved_files = self.config_manager.get_last_attached_files()
             if saved_files:
                 self.attached_files = saved_files
         else:
-            # Clear invalid workspace từ config
+            # Clear invalid workspace from config
             self.current_workspace_path = None
             self.current_workspace_name = None
-            if last_workspace:  # Có workspace path nhưng không tồn tại
+            if last_workspace:  # Have workspace path but doesn't exist
                 self.config_manager.set_last_workspace(None)
         
-        # Thiết lập ngôn ngữ từ cấu hình
+        # Set language from config
         self.current_language = self.config_manager.get_language()
         
-        # Từ điển cho đa ngôn ngữ
+        # Dictionary for translations
         self.translations = get_translations()
         
-        # Cập nhật tiêu đề cửa sổ theo ngôn ngữ đã chọn
+        # Update window title based on selected language
         self.setWindowTitle(self.get_translation("window_title"))
         
-        # Thiết lập stylesheet
+        # Set stylesheet
         self.setStyleSheet(get_main_stylesheet())
         
         self.layout = QtWidgets.QVBoxLayout()
         self.layout.setSpacing(12)
         self.layout.setContentsMargins(20, 20, 20, 20)
         
-        # Thêm chọn ngôn ngữ
+        # Add language selection
         self._setup_language_selection()
         
-        # Thêm tiêu đề và hướng dẫn
+        # Add title and instructions
         self._setup_title_and_info()
         
-        # Thêm input area
+        # Add input area
         self._setup_input_area()
         
-        # Thêm horizontal attachment areas (files + images)
+        # Add horizontal attachment areas (files + images)
         self._setup_horizontal_attachments()
         
-        # Thêm continue checkbox và warning
+        # Add continue checkbox and warning
         self._setup_continue_options()
         
-        # Thêm buttons
+        # Add buttons
         self._setup_buttons()
         
         self.setLayout(self.layout)
         
-        # Thiết lập focus cho input khi mở dialog
+        # Set focus to input when dialog opens
         self.input.setFocus()
         
-        # Thiết lập drop shadow
+        # Set up drop shadow
         self._setup_shadow_effect()
         
-        # Restore attached files UI nếu có
+        # Restore attached files UI if any
         self._restore_attached_files_ui()
         
-        # Force refresh button styles để apply semantic colors
+        # Force refresh button styles to apply semantic colors
         self._refresh_button_styles()
         
         self.result_text = None
@@ -166,12 +166,12 @@ class InputDialog(QtWidgets.QDialog):
         self.resize_timer.setInterval(500)  # Save 500ms after last resize
     
     def _setup_language_selection(self):
-        """Thiết lập phần chọn ngôn ngữ"""
+        """Set up language selection"""
         language_layout = QtWidgets.QHBoxLayout()
         self.language_label = QtWidgets.QLabel(self.get_translation("language_label"), self)
         self.language_combo = QtWidgets.QComboBox(self)
         
-        # Điều chỉnh thuộc tính cho QComboBox
+        # Adjust QComboBox properties
         self.language_combo.setMaxVisibleItems(2)
         self.language_combo.setSizeAdjustPolicy(QtWidgets.QComboBox.AdjustToContents)
         self.language_combo.setFocusPolicy(QtCore.Qt.StrongFocus)
@@ -179,7 +179,7 @@ class InputDialog(QtWidgets.QDialog):
         self.language_combo.addItem("English", "en")
         self.language_combo.addItem("Tiếng Việt", "vi")
         
-        # Thiết lập ngôn ngữ từ cấu hình đã lưu
+        # Set language from saved config
         if self.current_language == "vi":
             self.language_combo.setCurrentIndex(1)
         else:
@@ -194,22 +194,22 @@ class InputDialog(QtWidgets.QDialog):
         self.layout.addLayout(language_layout)
     
     def _setup_title_and_info(self):
-        """Thiết lập thông tin hướng dẫn"""
-        # Thêm hướng dẫn
+        """Set up title and instructions"""
+        # Add instructions
         self.info_label = QtWidgets.QLabel(self.get_translation("info_label"), self)
         self.info_label.setObjectName("infoLabel")
         self.info_label.setWordWrap(True)
         self.layout.addWidget(self.info_label)
     
     def _setup_input_area(self):
-        """Thiết lập khu vực nhập liệu"""
-        # Sử dụng custom TextEdit để handle image paste
+        """Set up input area"""
+        # Use custom TextEdit to handle image paste
         self.input = PasteImageTextEdit(self)
         self.input.setPlaceholderText(self.get_translation("input_placeholder"))
         self.input.setMinimumHeight(200)  # Larger minimum for big window
         self.input.setMaximumHeight(400)  # Allow more text editing space
         
-        # Apply beautiful input styling (without problematic scrollbar)
+        # Apply beautiful input styling
         self.input.setStyleSheet(get_main_input_textedit_stylesheet())
         
         # Connect image paste signal
@@ -218,10 +218,11 @@ class InputDialog(QtWidgets.QDialog):
         self.layout.addWidget(self.input)
     
     def _setup_horizontal_attachments(self):
-        """Thiết lập khu vực đính kèm file và hình ảnh theo chiều ngang"""
+        """Set up horizontal file and image attachment areas"""
         # Main horizontal container
         attachments_container = QtWidgets.QHBoxLayout()
-        attachments_container.setSpacing(15)  # Space between file and image sections
+        attachments_container.setSpacing(16)  # Space between file and image sections
+        attachments_container.setContentsMargins(0, 8, 0, 8)  # Vertical spacing
         
         # === LEFT SIDE: File Attachments ===
         file_section = self._create_file_attachment_section()
@@ -234,11 +235,11 @@ class InputDialog(QtWidgets.QDialog):
         self.layout.addLayout(attachments_container)
     
     def _create_file_attachment_section(self):
-        """Tạo section đính kèm file"""
+        """Create file attachment section"""
         file_widget = QtWidgets.QWidget()
         file_layout = QtWidgets.QVBoxLayout(file_widget)
         file_layout.setContentsMargins(0, 0, 0, 0)
-        file_layout.setSpacing(6)
+        file_layout.setSpacing(8)  # Consistent spacing
         
         # All file buttons in one row
         file_buttons_layout = QtWidgets.QHBoxLayout()
@@ -248,86 +249,136 @@ class InputDialog(QtWidgets.QDialog):
         self.attach_btn = QtWidgets.QPushButton(self.get_translation("attach_btn"), self)
         self.attach_btn.setObjectName("attachBtn")
         self.attach_btn.clicked.connect(self.attach_file)
-        self.attach_btn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.attach_btn.setProperty("button-type", "info")
         
-        # Clear buttons
-        self.clear_selected_btn = QtWidgets.QPushButton(self.get_translation("clear_selected"), self)
+        # Clear Selected button
+        self.clear_selected_btn = QtWidgets.QPushButton(self.get_translation("clear_selected_btn"), self)
         self.clear_selected_btn.setObjectName("clearSelectedBtn")
         self.clear_selected_btn.clicked.connect(self.clear_selected_files)
         self.clear_selected_btn.setEnabled(False)
-        self.clear_selected_btn.setToolTip(self.get_translation("clear_selected_tooltip"))
-        self.clear_selected_btn.setProperty("button-type", "warning")
         
-        self.clear_all_btn = QtWidgets.QPushButton(self.get_translation("clear_all"), self)
+        # Clear All button
+        self.clear_all_btn = QtWidgets.QPushButton(self.get_translation("clear_all_btn"), self)
         self.clear_all_btn.setObjectName("clearAllBtn")
         self.clear_all_btn.clicked.connect(self.clear_all_files)
         self.clear_all_btn.setEnabled(False)
-        self.clear_all_btn.setToolTip(self.get_translation("clear_all_tooltip"))
-        self.clear_all_btn.setProperty("button-type", "danger")
         
-        # Add all buttons to same row
         file_buttons_layout.addWidget(self.attach_btn)
         file_buttons_layout.addWidget(self.clear_selected_btn)
         file_buttons_layout.addWidget(self.clear_all_btn)
-        file_buttons_layout.addStretch()
-        
         file_layout.addLayout(file_buttons_layout)
         
+        # File drop area with updated styling
+        self.file_drop_area = QtWidgets.QWidget()
+        self.file_drop_area.setObjectName("fileDropArea")
+        self.file_drop_area.setMinimumHeight(200)
+        self.file_drop_area.setStyleSheet(get_file_container_stylesheet())
         
-        # File list with styled container to match image section
-        self.file_list_container = QtWidgets.QFrame()
-        self.file_list_container.setFrameStyle(QtWidgets.QFrame.NoFrame)
-        self.file_list_container.setStyleSheet(get_file_container_stylesheet())
-        self.file_list_container.setVisible(True)  # Always show like image container
-        self.file_list_container.setFixedHeight(300)  # Large height for many file items
-        
-        # Container layout
-        file_container_layout = QtWidgets.QVBoxLayout(self.file_list_container)
-        file_container_layout.setContentsMargins(2, 2, 2, 2)  # Match image container padding
-        file_container_layout.setSpacing(0)  # No spacing for full fill
-        
-        # File placeholder (shown when no files)
-        self.file_placeholder = QtWidgets.QLabel(self.get_translation("file_placeholder"))
+        # Placeholder text for empty state
+        self.file_placeholder = QtWidgets.QLabel(self.get_translation("file_drop_placeholder"), self.file_drop_area)
         self.file_placeholder.setAlignment(QtCore.Qt.AlignCenter)
-        self.file_placeholder.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.file_placeholder.setStyleSheet(get_file_placeholder_stylesheet())
         
-        # File list inside container
-        self.file_list = QtWidgets.QListWidget()
-        self.file_list.setVisible(False)  # Hidden by default, show when files added
+        # File list widget
+        self.file_list = QtWidgets.QListWidget(self.file_drop_area)
+        self.file_list.setStyleSheet(get_file_list_stylesheet())
         self.file_list.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
-        self.file_list.setToolTip(self.get_translation("file_list_tooltip"))
+        self.file_list.itemSelectionChanged.connect(self.update_clear_buttons_state)
         self.file_list.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.file_list.customContextMenuRequested.connect(self.show_context_menu)
-        self.file_list.itemSelectionChanged.connect(self.update_clear_buttons_state)
-        self.file_list.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         
-        # Apply dark theme styling
-        self.file_list.setStyleSheet(get_file_list_stylesheet())
+        # Layout for file drop area
+        file_drop_layout = QtWidgets.QVBoxLayout(self.file_drop_area)
+        file_drop_layout.setContentsMargins(12, 12, 12, 12)  # Consistent padding
+        file_drop_layout.addWidget(self.file_placeholder)
+        file_drop_layout.addWidget(self.file_list)
+        self.file_list.hide()  # Initially hide list
         
-        # Add both to container layout directly - they will fill available space
-        file_container_layout.addWidget(self.file_placeholder)
-        file_container_layout.addWidget(self.file_list)
-        
-        file_layout.addWidget(self.file_list_container)
+        file_layout.addWidget(self.file_drop_area)
         
         return file_widget
-    
+
     def _create_image_attachment_section(self):
-        """Tạo section đính kèm hình ảnh - sử dụng component riêng"""
-        # Sử dụng ImageAttachmentWidget component
-        self.image_attachment_widget = ImageAttachmentWidget(self, self.current_language, self.translations, self.config_manager)
+        """Create image attachment section"""
+        image_widget = QtWidgets.QWidget()
+        image_layout = QtWidgets.QVBoxLayout(image_widget)
+        image_layout.setContentsMargins(0, 0, 0, 0)
+        image_layout.setSpacing(6)
         
-        # Reference các thành phần cần thiết từ component
-        self.attach_image_btn = self.image_attachment_widget.attach_image_btn
-        self.clear_images_btn = self.image_attachment_widget.clear_images_btn
-        self.drag_drop_widget = self.image_attachment_widget.drag_drop_widget
-        self.image_scroll_area = self.image_attachment_widget.image_scroll_area
-        self.image_scroll_widget = self.image_attachment_widget.image_scroll_widget
-        self.image_placeholder = self.image_attachment_widget.image_placeholder
+        # Image buttons layout
+        image_buttons_layout = QtWidgets.QHBoxLayout()
+        image_buttons_layout.setSpacing(8)
         
-        return self.image_attachment_widget
+        # Attach Image button
+        self.attach_image_btn = QtWidgets.QPushButton(self.get_translation("attach_image_btn"), self)
+        self.attach_image_btn.setObjectName("attachImageBtn")
+        
+        # Clear Images button
+        self.clear_images_btn = QtWidgets.QPushButton(self.get_translation("clear_images_btn"), self)
+        self.clear_images_btn.setObjectName("clearImagesBtn")
+        
+        # Save Image button
+        self.save_image_btn = QtWidgets.QPushButton(self.get_translation("save_image_btn"), self)
+        self.save_image_btn.setObjectName("saveImageBtn")
+        
+        image_buttons_layout.addWidget(self.attach_image_btn)
+        image_buttons_layout.addWidget(self.clear_images_btn)
+        image_buttons_layout.addWidget(self.save_image_btn)
+        image_layout.addLayout(image_buttons_layout)
+        
+        # Image drop area
+        self.image_drop_area = QtWidgets.QWidget()
+        self.image_drop_area.setObjectName("imageDropArea")
+        self.image_drop_area.setMinimumHeight(200)
+        self.image_drop_area.setStyleSheet(get_file_container_stylesheet())
+        
+        # Placeholder text for empty state
+        self.image_placeholder = QtWidgets.QLabel(self.get_translation("image_drop_placeholder"), self.image_drop_area)
+        self.image_placeholder.setAlignment(QtCore.Qt.AlignCenter)
+        self.image_placeholder.setStyleSheet(get_file_placeholder_stylesheet())
+        
+        # Layout for image drop area
+        image_drop_layout = QtWidgets.QVBoxLayout(self.image_drop_area)
+        image_drop_layout.addWidget(self.image_placeholder)
+        
+        image_layout.addWidget(self.image_drop_area)
+        
+        return image_widget
+
+    def _setup_continue_options(self):
+        """Set up continue conversation checkbox and warning"""
+        continue_layout = QtWidgets.QVBoxLayout()
+        
+        # Continue conversation checkbox
+        self.continue_checkbox = QtWidgets.QCheckBox(self.get_translation("continue_checkbox"), self)
+        self.continue_checkbox.setObjectName("continueCheckbox")
+        continue_layout.addWidget(self.continue_checkbox)
+        
+        # Warning label
+        self.continue_warning = QtWidgets.QLabel(self.get_translation("continue_warning"), self)
+        self.continue_warning.setObjectName("warningLabel")
+        self.continue_warning.setWordWrap(True)
+        continue_layout.addWidget(self.continue_warning)
+        
+        self.layout.addLayout(continue_layout)
+
+    def _setup_buttons(self):
+        """Set up the Send and Close buttons"""
+        button_layout = QtWidgets.QHBoxLayout()
+        
+        # Send button (renamed from Submit)
+        self.send_btn = QtWidgets.QPushButton(self.get_translation("send_btn"), self)
+        self.send_btn.setObjectName("sendBtn")
+        self.send_btn.clicked.connect(self.submit_text)
+        
+        # Close button
+        self.close_btn = QtWidgets.QPushButton(self.get_translation("close_btn"), self)
+        self.close_btn.setObjectName("closeBtn")
+        self.close_btn.clicked.connect(self.close)
+        
+        button_layout.addWidget(self.send_btn)
+        button_layout.addWidget(self.close_btn)
+        
+        self.layout.addLayout(button_layout)
 
     def handle_pasted_image(self, db_image_path):
         """Handle image pasted into input area - use async processing like existing system"""
@@ -421,50 +472,6 @@ class InputDialog(QtWidgets.QDialog):
         self.file_list.itemSelectionChanged.connect(self.update_clear_buttons_state)
         self.layout.addWidget(self.file_list)
 
-    
-    def _setup_continue_options(self):
-        """Thiết lập các tùy chọn tiếp tục cuộc trò chuyện"""
-        # Thêm checkbox tiếp tục trò chuyện
-        continue_default = self.config_manager.get('ui_preferences.continue_chat_default', True)
-        self.continue_checkbox = QtWidgets.QCheckBox(self.get_translation("continue_checkbox"), self)
-        self.continue_checkbox.setChecked(continue_default)
-        self.continue_checkbox.setToolTip("Khi chọn, Agent sẽ tự động hiển thị lại hộp thoại này sau khi trả lời")
-        self.layout.addWidget(self.continue_checkbox)
-        
-
-        
-        # Thêm nhãn cảnh báo về quy tắc gọi lại
-        self.warning_label = QtWidgets.QLabel(
-            self.get_translation("warning_label"), 
-            self
-        )
-        self.warning_label.setObjectName("warningLabel")
-        self.warning_label.setWordWrap(True)
-        self.layout.addWidget(self.warning_label)
-    
-    def _setup_buttons(self):
-        """Thiết lập các nút điều khiển"""
-        # Tạo layout ngang cho các nút
-        button_layout = QtWidgets.QHBoxLayout()
-        button_layout.setSpacing(10)
-        
-        self.submit_btn = QtWidgets.QPushButton(self.get_translation("submit_btn"), self)
-        self.submit_btn.clicked.connect(self.submit_text)
-        self.submit_btn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.submit_btn.setToolTip("Gửi tin nhắn (Ctrl+Enter)")
-        self.submit_btn.setProperty("button-type", "success")
-        
-        self.close_btn = QtWidgets.QPushButton(self.get_translation("close_btn"), self)
-        self.close_btn.setObjectName("closeBtn")
-        self.close_btn.clicked.connect(self.close)
-        self.close_btn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.close_btn.setToolTip("Đóng hộp thoại và kết thúc cuộc trò chuyện")
-        
-        button_layout.addWidget(self.submit_btn)
-        button_layout.addWidget(self.close_btn)
-        
-        self.layout.addLayout(button_layout)
-    
     def _setup_shadow_effect(self):
         """Thiết lập hiệu ứng đổ bóng"""
         shadow = QtWidgets.QGraphicsDropShadowEffect(self)
@@ -523,14 +530,14 @@ class InputDialog(QtWidgets.QDialog):
 
         self.continue_checkbox.setText(self.get_translation("continue_checkbox"))
         # No thinking UI to update
-        self.warning_label.setText(self.get_translation("warning_label"))
+        self.continue_warning.setText(self.get_translation("continue_warning"))
         
         # Cập nhật các nút
         self.attach_btn.setText(self.get_translation("attach_btn"))
-        self.submit_btn.setText(self.get_translation("submit_btn"))
+        self.send_btn.setText(self.get_translation("send_btn"))
         self.close_btn.setText(self.get_translation("close_btn"))
-        self.clear_selected_btn.setText(self.get_translation("clear_selected"))
-        self.clear_all_btn.setText(self.get_translation("clear_all"))
+        self.clear_selected_btn.setText(self.get_translation("clear_selected_btn"))
+        self.clear_all_btn.setText(self.get_translation("clear_all_btn"))
         
         # Cập nhật image component language
         if hasattr(self, 'image_attachment_widget'):
@@ -632,19 +639,19 @@ class InputDialog(QtWidgets.QDialog):
         # Update Clear Selected button
         self.clear_selected_btn.setEnabled(has_selection)
         if has_selection:
-            self.clear_selected_btn.setText(f"{self.get_translation('clear_selected')} ({len(selected_items)})")
+            self.clear_selected_btn.setText(f"{self.get_translation('clear_selected_btn')} ({len(selected_items)})")
             self.clear_selected_btn.setToolTip("Xóa các items đã chọn")
         else:
-            self.clear_selected_btn.setText(self.get_translation("clear_selected"))
+            self.clear_selected_btn.setText(self.get_translation("clear_selected_btn"))
             self.clear_selected_btn.setToolTip("Chọn items để xóa")
         
         # Update Clear All button
         self.clear_all_btn.setEnabled(has_files)
         if has_files:
-            self.clear_all_btn.setText(f"{self.get_translation('clear_all')} ({len(self.attached_files)})")
+            self.clear_all_btn.setText(f"{self.get_translation('clear_all_btn')} ({len(self.attached_files)})")
             self.clear_all_btn.setToolTip("Xóa tất cả items đã đính kèm")
         else:
-            self.clear_all_btn.setText(self.get_translation("clear_all"))
+            self.clear_all_btn.setText(self.get_translation("clear_all_btn"))
             self.clear_all_btn.setToolTip("Không có items để xóa")
     
     def clear_selected_files(self):
@@ -802,69 +809,28 @@ class InputDialog(QtWidgets.QDialog):
                 self.clear_all_files()
 
     def submit_text(self):
-        """
-        Phương thức xử lý khi người dùng nhấn nút Gửi.
-        """
+        """Submit text directly through extension"""
+        # Get input text
         text = self.input.toPlainText()
-        attached_images = self.image_attachment_widget.get_attached_images() if hasattr(self, 'image_attachment_widget') else self.attached_images
-        if text.strip() or self.attached_files or attached_images:
-            result_dict = {
-                "text": text,
-                "language": self.current_language
-            }
-            
-            # Thêm thông tin về file/folder đính kèm nếu có (chỉ metadata, không đọc content)
-            if self.attached_files:
-                result_dict["attached_files"] = []
-                for item_info in self.attached_files:
-                    try:
-                        relative_path = item_info["relative_path"]
-                        workspace_name = item_info["workspace_name"]
-                        name = item_info["name"]
-                        item_type = item_info["type"]
-                        
-                        # Chỉ thêm metadata, không đọc file content
-                        result_dict["attached_files"].append({
-                            "relative_path": relative_path,
-                            "workspace_name": workspace_name,
-                            "name": name,
-                            "type": item_type
-                        })
-                    except Exception as e:
-                        result_dict["attached_files"].append({
-                            "relative_path": item_info.get("relative_path", "unknown"),
-                            "workspace_name": item_info.get("workspace_name", ""),
-                            "name": item_info.get("name", "unknown"),
-                            "type": item_info.get("type", "unknown"),
-                            "error": str(e)
-                        })
-            
-            # Thêm thông tin về hình ảnh đính kèm nếu có
-            attached_images = self.image_attachment_widget.get_attached_images() if hasattr(self, 'image_attachment_widget') else self.attached_images
-            if attached_images:
-                result_dict["attached_images"] = []
-                for img_info in attached_images:
-                    result_dict["attached_images"].append({
-                        "base64_data": img_info["base64_data"],
-                        "media_type": img_info["media_type"],
-                        "filename": img_info["filename"]
-                    })
-            
-            self.result_text = json.dumps(result_dict, ensure_ascii=False)
-            self.result_continue = self.continue_checkbox.isChecked()
-            self.result_ready = True
-            
-            # Lưu trạng thái checkbox vào config để lần sau sử dụng
-            self.config_manager.set('ui_preferences.continue_chat_default', self.continue_checkbox.isChecked())
-            # No thinking level to save - always "high" mode
-            self.config_manager.save_config()
-            
-            # Save images to config before closing
-            if hasattr(self, 'image_attachment_widget'):
-                self.image_attachment_widget.save_images_to_config()
-            
-            self.input.clear()
-            self.accept()
+        
+        # Get continue conversation state
+        continue_chat = self.continue_checkbox.isChecked()
+        
+        # Format response with attached files
+        response = {
+            'text': text,
+            'attached_files': self.attached_files,
+            'workspace': self.current_workspace_name,
+            'continue_chat': continue_chat
+        }
+        
+        # Set results
+        self.result_text = text
+        self.result_continue = continue_chat
+        self.result_ready = True
+        
+        # Close dialog
+        self.accept()
     
     # Cho phép gửi bằng phím Enter
     def resizeEvent(self, event):
@@ -901,7 +867,7 @@ class InputDialog(QtWidgets.QDialog):
     def _refresh_button_styles(self):
         """Force refresh button styles để apply semantic colors"""
         buttons_to_refresh = [
-            self.submit_btn,
+            self.send_btn,
             self.attach_btn,
             self.clear_selected_btn,
             self.clear_all_btn,

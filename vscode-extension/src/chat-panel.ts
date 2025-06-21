@@ -7,6 +7,7 @@ export class ChatPanelProvider implements vscode.WebviewViewProvider {
     private _view?: vscode.WebviewView;
     private _context: vscode.ExtensionContext;
     private _fileManager: FileManager;
+    private _mcpClient: MCPClient;
 
     constructor(
         context: vscode.ExtensionContext,
@@ -15,6 +16,7 @@ export class ChatPanelProvider implements vscode.WebviewViewProvider {
     ) {
         this._context = context;
         this._fileManager = fileManager;
+        this._mcpClient = mcpClient;
     }
 
     public resolveWebviewView(
@@ -66,83 +68,82 @@ export class ChatPanelProvider implements vscode.WebviewViewProvider {
     }
 
     private async _handleSendMessage(text: string): Promise<void> {
-        if (!text.trim()) {
+        if (!text.trim() && this._fileManager.getAttachmentCount() === 0) {
+            vscode.window.showWarningMessage('No message or attachments to send.');
             return;
         }
 
         try {
-            // Format the message like the standalone UI does
             const formattedMessage = this._formatMessageForAI(text);
             
-            // Copy to clipboard for easy pasting into Cursor AI chat
             await vscode.env.clipboard.writeText(formattedMessage);
             
-            // Show success message
             vscode.window.showInformationMessage(
-                'Message formatted and copied to clipboard! Paste it into Cursor AI chat.',
-                'Open AI Chat'
+                'AI context copied to clipboard. Paste it into the main chat.',
+                'Focus Chat'
             ).then(selection => {
-                if (selection === 'Open AI Chat') {
-                    // Try to open the AI chat in Cursor
-                    vscode.commands.executeCommand('workbench.panel.chat.view.focus');
+                if (selection === 'Focus Chat') {
+                    vscode.commands.executeCommand('workbench.action.chat.focus');
                 }
             });
 
-            // Update UI to show what was sent
             this._postMessage({
                 type: 'messageSent',
-                message: 'Message copied to clipboard! Paste it into Cursor AI chat to use the ai_extension_tool.'
+                message: 'Context copied!' 
             });
 
         } catch (error) {
-            console.error('Error formatting message:', error);
-            vscode.window.showErrorMessage(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            vscode.window.showErrorMessage(`Error preparing message: ${errorMessage}`);
+            this._postMessage({ 
+                type: 'showError', 
+                message: `Error: ${errorMessage}` 
+            });
         }
     }
 
     private _formatMessageForAI(text: string): string {
         let formattedMessage = text;
 
-        // Get attachments
         const attachedFiles = this._fileManager.getAttachedFiles();
-        const attachedImages = this._fileManager.getAttachedImages();
-
-        // Add attached files section if there are any
-        if (attachedFiles.length > 0 || attachedImages.length > 0) {
-            formattedMessage += '\n\n<AI_extension_ATTACHED_FILES>\n';
+        
+        if (attachedFiles.length > 0) {
+            formattedMessage += "\n\n<AI_INTERACTIVE_ATTACHED_FILES>\n";
+            let workspaceName: string | undefined;
             
-            const folders = attachedFiles.filter(f => f.type === 'folder');
-            const files = attachedFiles.filter(f => f.type === 'file');
+            const folders = attachedFiles.filter(f => f.type === 'folder').map(f => f.relativePath);
+            const files = attachedFiles.filter(f => f.type === 'file').map(f => f.relativePath);
+            
+            const firstFile = attachedFiles[0];
+            if (firstFile) {
+                const parts = firstFile.relativePath.split('/');
+                if (parts.length > 1) {
+                    workspaceName = parts[0];
+                }
+            }
             
             if (folders.length > 0) {
-                formattedMessage += 'FOLDERS:\n';
+                formattedMessage += "FOLDERS:\n";
                 folders.forEach(folder => {
-                    formattedMessage += `- ${folder.relativePath}\n`;
+                    formattedMessage += `- ${folder}\n`;
                 });
-                formattedMessage += '\n';
             }
             
             if (files.length > 0) {
-                formattedMessage += 'FILES:\n';
+                formattedMessage += "FILES:\n";
                 files.forEach(file => {
-                    formattedMessage += `- ${file.relativePath}\n`;
+                    formattedMessage += `- ${file}\n`;
                 });
-                formattedMessage += '\n';
             }
             
-            formattedMessage += '</AI_extension_ATTACHED_FILES>\n\n';
+            formattedMessage += "</AI_INTERACTIVE_ATTACHED_FILES>\n";
             
-            // Add workspace information
-            const workspace = this._getCurrentWorkspace();
-            if (workspace) {
-                const workspaceName = workspace.split('/').pop() || 'workspace';
-                formattedMessage += `<AI_extension_WORKSPACE>${workspaceName}</AI_extension_WORKSPACE>\n`;
+            if (workspaceName) {
+                formattedMessage += `\n<AI_INTERACTIVE_WORKSPACE>${workspaceName}</AI_INTERACTIVE_WORKSPACE>`;
             }
         }
 
-        // Add continue chat flag (default to false for now)
-        formattedMessage += `<AI_extension_CONTINUE_CHAT>false</AI_extension_CONTINUE_CHAT>\n`;
-
+        formattedMessage += `\n\n<AI_INTERACTIVE_CONTINUE_CHAT>false</AI_INTERACTIVE_CONTINUE_CHAT>`;
         return formattedMessage;
     }
 
@@ -243,20 +244,9 @@ export class ChatPanelProvider implements vscode.WebviewViewProvider {
     }
 
     private _getHtmlForWebview(webview: vscode.Webview): string {
-        const styleResetUri = webview.asWebviewUri(
-            vscode.Uri.joinPath(this._context.extensionUri, 'media', 'reset.css')
-        );
-        const styleVSCodeUri = webview.asWebviewUri(
-            vscode.Uri.joinPath(this._context.extensionUri, 'media', 'vscode.css')
-        );
-        const styleMainUri = webview.asWebviewUri(
-            vscode.Uri.joinPath(this._context.extensionUri, 'media', 'main.css')
-        );
-
-        const scriptUri = webview.asWebviewUri(
-            vscode.Uri.joinPath(this._context.extensionUri, 'media', 'main.js')
-        );
-
+        const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._context.extensionUri, 'media', 'main.js'));
+        const stylesResetUri = webview.asWebviewUri(vscode.Uri.joinPath(this._context.extensionUri, 'media', 'reset.css'));
+        const stylesMainUri = webview.asWebviewUri(vscode.Uri.joinPath(this._context.extensionUri, 'media', 'main.css'));
         const nonce = this._getNonce();
 
         return `<!DOCTYPE html>
@@ -265,66 +255,31 @@ export class ChatPanelProvider implements vscode.WebviewViewProvider {
                 <meta charset="UTF-8">
                 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <link href="${styleResetUri}" rel="stylesheet">
-                <link href="${styleVSCodeUri}" rel="stylesheet">
-                <link href="${styleMainUri}" rel="stylesheet">
-                <title>AI extension Chat</title>
+                <link href="${stylesResetUri}" rel="stylesheet">
+                <link href="${stylesMainUri}" rel="stylesheet">
+                <title>AI Context Builder</title>
             </head>
             <body>
                 <div class="chat-container">
-                    <div class="chat-header">
-                        <h3>AI extension Helper</h3>
-                        <div class="header-buttons">
-                            <button id="newConversationBtn" class="header-btn" title="New Conversation">
-                                <span class="codicon codicon-add"></span>
-                            </button>
-                            <button id="clearAttachmentsBtn" class="header-btn" title="Clear Attachments">
-                                <span class="codicon codicon-clear-all"></span>
-                            </button>
-                        </div>
-                    </div>
-                    
                     <div class="info-section">
-                        <p>📝 Compose messages with file attachments</p>
-                        <p>📋 Copies formatted messages to clipboard</p>
-                        <p>🤖 Paste into Cursor AI chat to use ai_extension_tool</p>
+                        <p>📝 Build context with text and attachments.</p>
+                        <p>📋 Click "Copy Context" to send to the main chat.</p>
                     </div>
                     
                     <div class="attachments-section">
                         <div class="attachment-buttons">
-                            <button id="attachFileBtn" class="attach-btn">
-                                <span class="codicon codicon-file-add"></span>
-                                Attach File
-                            </button>
-                            <button id="attachImageBtn" class="attach-btn">
-                                <span class="codicon codicon-device-camera"></span>
-                                Attach Image
-                            </button>
+                            <button id="attachFileBtn" class="attach-btn">Attach File/Folder</button>
                         </div>
                         <div id="attachmentsList" class="attachments-list"></div>
                     </div>
 
                     <div class="input-section">
-                        <div class="input-container">
                             <textarea id="messageInput" placeholder="Type your message..." rows="4"></textarea>
-                            <div class="input-controls">
-                                <div class="button-group">
-                                    <button id="copyBtn" class="copy-btn">
-                                        <span class="codicon codicon-copy"></span>
-                                        Copy to Clipboard
-                                    </button>
-                                    <button id="sendBtn" class="send-btn">
-                                        <span class="codicon codicon-send"></span>
-                                        Copy & Open AI Chat
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                        <button id="sendBtn" class="send-btn">Copy Context</button>
                     </div>
 
                     <div id="statusArea" class="status-area"></div>
                 </div>
-
                 <script nonce="${nonce}" src="${scriptUri}"></script>
             </body>
             </html>`;

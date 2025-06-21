@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Allow the package to be run as a module with:
-python -m ai_extension_tool
+python -m AI_EXTENSION_tool
 """
 
 from .cli import main

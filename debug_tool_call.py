@@ -85,28 +85,28 @@ def main():
         # Test different parameter formats
         formats_to_test = [
             ("Current format", {
-                "name": "ai_extension_tool",
+                "name": "AI_EXTENSION_tool",
                 "arguments": {
                     "random_string": "activate"
                 }
             }),
             ("Flattened arguments", {
-                "name": "ai_extension_tool",
+                "name": "AI_EXTENSION_tool",
                 "random_string": "activate"
             }),
             ("Arguments as array", {
-                "name": "ai_extension_tool",
+                "name": "AI_EXTENSION_tool",
                 "arguments": ["activate"]
             }),
             ("No arguments", {
-                "name": "ai_extension_tool"
+                "name": "AI_EXTENSION_tool"
             }),
             ("Empty arguments", {
-                "name": "ai_extension_tool",
+                "name": "AI_EXTENSION_tool",
                 "arguments": {}
             }),
             ("Different method name", {
-                "tool": "ai_extension_tool",
+                "tool": "AI_EXTENSION_tool",
                 "arguments": {
                     "random_string": "activate"
                 }

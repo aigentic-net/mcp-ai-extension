@@ -25,7 +25,7 @@ def process_extension_request(message: str, attached_files: list = None, attache
     
     # Process attached files if any
     if attached_files or attached_images:
-        full_response_text += "\n\n<AI_extension_ATTACHED_FILES>\n"
+        full_response_text += "\n\n<AI_EXTENSION_ATTACHED_FILES>\n"
         
         workspace_name = None
         if workspace:
@@ -72,14 +72,14 @@ def process_extension_request(message: str, attached_files: list = None, attache
                 full_response_text += f"- {relative_path}\n"
             full_response_text += "\n"
         
-        full_response_text += "</AI_extension_ATTACHED_FILES>\n"
+        full_response_text += "</AI_EXTENSION_ATTACHED_FILES>\n"
         
         # Add workspace information
         if workspace_name:
-            full_response_text += f"\n<AI_extension_WORKSPACE>{workspace_name}</AI_extension_WORKSPACE>"
+            full_response_text += f"\n<AI_EXTENSION_WORKSPACE>{workspace_name}</AI_EXTENSION_WORKSPACE>"
     
     # Add continue chat flag
-    full_response_text += f"\n\n<AI_extension_CONTINUE_CHAT>{str(continue_chat).lower()}</AI_extension_CONTINUE_CHAT>"
+    full_response_text += f"\n\n<AI_EXTENSION_CONTINUE_CHAT>{str(continue_chat).lower()}</AI_EXTENSION_CONTINUE_CHAT>"
     
     return full_response_text
 

@@ -325,698 +325,269 @@ class FileTypeIcons:
 
 # Legacy functions for backward compatibility
 def get_main_stylesheet():
-    """Main stylesheet for dialog"""
-    return f"""
-    QDialog {{
-        background-color: {ModernTheme.COLORS['background'].name()};
-        color: {ModernTheme.COLORS['text'].name()};
-        font-family: {ModernTheme.FONTS['family']};
-        font-size: {ModernTheme.FONTS['default_size']}px;
-    }}
-    
-    QLabel {{
-        color: {ModernTheme.COLORS['text'].name()};
-        font-size: {ModernTheme.FONTS['default_size']}px;
-        background: transparent;
-    }}
-    
-    QLineEdit {{
-        background-color: {ModernTheme.COLORS['surface0'].name()};
-        border: 1px solid {ModernTheme.COLORS['surface1'].name()};
-        border-radius: {ModernTheme.SPACING['border_radius']}px;
-        padding: {ModernTheme.SPACING['medium']}px;
-        color: {ModernTheme.COLORS['text'].name()};
-        font-size: {ModernTheme.FONTS['default_size']}px;
-    }}
-    
-    QLineEdit:focus {{
-        border: 2px solid {ModernTheme.COLORS['accent_blue'].name()};
-    }}
-    
-
-    
-    /* Default button styling */
-    QPushButton {{
-        background-color: {ModernTheme.COLORS['accent_blue'].name()};
-        color: {ModernTheme.COLORS['background'].name()};
-        border: none;
-        border-radius: {ModernTheme.SPACING['border_radius']}px;
-        padding: {ModernTheme.SPACING['medium']}px {ModernTheme.SPACING['large']}px;
-        font-size: {ModernTheme.FONTS['default_size']}px;
-        font-weight: 500;
-    }}
-    
-    QPushButton:hover {{
-        background-color: {ModernTheme.COLORS['accent_blue'].lighter(110).name()};
-    }}
-    
-    QPushButton:pressed {{
-        background-color: {ModernTheme.COLORS['accent_blue'].darker(110).name()};
-    }}
-    
-    QPushButton:disabled {{
-        background-color: {ModernTheme.COLORS['surface1'].name()};
-        color: {ModernTheme.COLORS['text_disabled'].name()};
-    }}
-    
-    /* Semantic button variants - HIGH PRIORITY */
-    QPushButton[button-type="success"] {{
-        background-color: {ModernTheme.COLORS['success'].name()} !important;
-        color: {ModernTheme.COLORS['background'].name()} !important;
-        border: none !important;
-    }}
-    
-    QPushButton[button-type="success"]:hover {{
-        background-color: {ModernTheme.COLORS['success'].lighter(110).name()} !important;
-    }}
-    
-    QPushButton[button-type="success"]:pressed {{
-        background-color: {ModernTheme.COLORS['success'].darker(110).name()} !important;
-    }}
-    
-    QPushButton[button-type="warning"] {{
-        background-color: {ModernTheme.COLORS['warning'].name()} !important;
-        color: {ModernTheme.COLORS['background'].name()} !important;
-        border: none !important;
-    }}
-    
-    QPushButton[button-type="warning"]:hover {{
-        background-color: {ModernTheme.COLORS['warning'].lighter(110).name()} !important;
-    }}
-    
-    QPushButton[button-type="warning"]:pressed {{
-        background-color: {ModernTheme.COLORS['warning'].darker(110).name()} !important;
-    }}
-    
-    QPushButton[button-type="danger"] {{
-        background-color: {ModernTheme.COLORS['error'].name()} !important;
-        color: {ModernTheme.COLORS['background'].name()} !important;
-        border: none !important;
-    }}
-    
-    QPushButton[button-type="danger"]:hover {{
-        background-color: {ModernTheme.COLORS['error'].lighter(110).name()} !important;
-    }}
-    
-    QPushButton[button-type="danger"]:pressed {{
-        background-color: {ModernTheme.COLORS['error'].darker(110).name()} !important;
-    }}
-    
-    QPushButton[button-type="info"] {{
-        background-color: {ModernTheme.COLORS['info'].name()} !important;
-        color: {ModernTheme.COLORS['background'].name()} !important;
-        border: none !important;
-    }}
-    
-    QPushButton[button-type="info"]:hover {{
-        background-color: {ModernTheme.COLORS['info'].lighter(110).name()} !important;
-    }}
-    
-    QPushButton[button-type="info"]:pressed {{
-        background-color: {ModernTheme.COLORS['info'].darker(110).name()} !important;
-    }}
-    
-    QPushButton[button-type="special"] {{
-        background-color: {ModernTheme.COLORS['accent_mauve'].name()} !important;
-        color: {ModernTheme.COLORS['background'].name()} !important;
-        border: none !important;
-    }}
-    
-    QPushButton[button-type="special"]:hover {{
-        background-color: {ModernTheme.COLORS['accent_mauve'].lighter(110).name()} !important;
-    }}
-    
-    QPushButton[button-type="special"]:pressed {{
-        background-color: {ModernTheme.COLORS['accent_mauve'].darker(110).name()} !important;
-    }}
-    
-    /* Secondary button variant */
-    QPushButton[button-type="secondary"] {{
-        background-color: {ModernTheme.COLORS['surface1'].name()} !important;
-        color: {ModernTheme.COLORS['text'].name()} !important;
-        border: 1px solid {ModernTheme.COLORS['surface2'].name()} !important;
-    }}
-    
-    QPushButton[button-type="secondary"]:hover {{
-        background-color: {ModernTheme.COLORS['surface2'].name()} !important;
-        border: 1px solid {ModernTheme.COLORS['accent_blue'].name()} !important;
-    }}
-    
-    QPushButton[button-type="secondary"]:pressed {{
-        background-color: {ModernTheme.COLORS['surface0'].name()} !important;
-    }}
-    
-    /* Close button - specific styling */
-    QPushButton#closeBtn {{
-        background-color: {ModernTheme.COLORS['surface1'].name()};
-        color: {ModernTheme.COLORS['text'].name()};
-        border: 1px solid {ModernTheme.COLORS['surface2'].name()};
-    }}
-    
-    QPushButton#closeBtn:hover {{
-        background-color: {ModernTheme.COLORS['error'].name()};
-        color: {ModernTheme.COLORS['background'].name()};
-        border: 1px solid {ModernTheme.COLORS['error'].darker(110).name()};
-    }}
-    
-    QPushButton#closeBtn:pressed {{
-        background-color: {ModernTheme.COLORS['error'].darker(110).name()};
-    }}
-    
-    QCheckBox {{
-        color: {ModernTheme.COLORS['text'].name()};
-        font-size: {ModernTheme.FONTS['default_size']}px;
-    }}
-    
-    QCheckBox::indicator {{
-        width: 18px;
-        height: 18px;
-        border-radius: 4px;
-        border: 2px solid {ModernTheme.COLORS['surface1'].name()};
-        background-color: {ModernTheme.COLORS['surface0'].name()};
-    }}
-    
-    QCheckBox::indicator:checked {{
-        background-color: {ModernTheme.COLORS['accent_blue'].name()};
-        border: 2px solid {ModernTheme.COLORS['accent_blue'].name()};
-    }}
-    
-    QComboBox {{
-        background-color: {ModernTheme.COLORS['surface0'].name()};
-        border: 1px solid {ModernTheme.COLORS['surface1'].name()};
-        border-radius: {ModernTheme.SPACING['border_radius']}px;
-        padding: {ModernTheme.SPACING['medium']}px;
-        color: {ModernTheme.COLORS['text'].name()};
-        font-size: {ModernTheme.FONTS['default_size']}px;
-    }}
-    
-    QComboBox:focus {{
-        border: 2px solid {ModernTheme.COLORS['accent_blue'].name()};
-    }}
-    
-    QComboBox::drop-down {{
+    """Get main window stylesheet with AI Interactive Tool theme"""
+    return """
+        QDialog {
+            background-color: #1a1b26;
+            color: #ffffff;
+        }
+        
+        QLabel {
+            color: #ffffff;
+            font-size: 14px;
+        }
+        
+        QComboBox {
+            background-color: #24283b;
+            color: #ffffff;
+            border: 1px solid #414868;
+            border-radius: 4px;
+            padding: 4px;
+            min-width: 100px;
+        }
+        
+        QComboBox::drop-down {
             border: none;
-        padding-right: 10px;
-    }}
-    
-    QComboBox QAbstractItemView {{
-        background-color: {ModernTheme.COLORS['surface0'].name()};
-        border: 1px solid {ModernTheme.COLORS['surface1'].name()};
-        color: {ModernTheme.COLORS['text'].name()};
-        selection-background-color: {ModernTheme.COLORS['accent_blue'].name()};
-        selection-color: {ModernTheme.COLORS['background'].name()};
-    }}
-    
-    /* List and Table styling */
-    QListWidget {{
-        background-color: {ModernTheme.COLORS['surface0'].name()};
-        border: 1px solid {ModernTheme.COLORS['surface1'].name()};
-        border-radius: {ModernTheme.SPACING['border_radius']}px;
-        color: {ModernTheme.COLORS['text'].name()};
-        font-size: {ModernTheme.FONTS['default_size']}px;
-        alternate-background-color: {ModernTheme.COLORS['surface0'].name()};
-    }}
-    
-    QListWidget::item {{
-        padding: {ModernTheme.SPACING['medium']}px;
-        border: 1px solid transparent;
-        color: {ModernTheme.COLORS['text'].name()};
-        border-radius: {ModernTheme.SPACING['border_radius']}px;
-    }}
-    
-    QListWidget::item:hover {{
-        background-color: {ModernTheme.COLORS['surface1'].name()};
-        color: {ModernTheme.COLORS['text'].name()};
-        border: 1px solid {ModernTheme.COLORS['accent_blue'].name()};
-        border-radius: {ModernTheme.SPACING['border_radius']}px;
-    }}
-    
-    QListWidget::item:selected {{
-        background-color: {ModernTheme.COLORS['accent_blue'].name()};
-        border: 1px solid {ModernTheme.COLORS['accent_blue'].darker(120).name()};
-        color: {ModernTheme.COLORS['background'].name()};
-        border-radius: {ModernTheme.SPACING['border_radius']}px;
-    }}
-    
-    QListWidget::item:selected:hover {{
-        background-color: {ModernTheme.COLORS['accent_blue'].lighter(110).name()};
-        border: 1px solid {ModernTheme.COLORS['accent_blue'].darker(120).name()};
-        color: {ModernTheme.COLORS['background'].name()};
-        border-radius: {ModernTheme.SPACING['border_radius']}px;
-    }}
-    
-    QTextEdit {{
-        background-color: {ModernTheme.COLORS['surface0'].name()};
-        border: 1px solid {ModernTheme.COLORS['surface1'].name()};
-        border-radius: {ModernTheme.SPACING['border_radius']}px;
-        color: {ModernTheme.COLORS['text'].name()};
-        font-size: {ModernTheme.FONTS['default_size']}px;
-        selection-background-color: {ModernTheme.COLORS['accent_blue'].name()};
-        selection-color: {ModernTheme.COLORS['background'].name()};
-    }}
-    
-    QTextEdit:focus {{
-        border: 2px solid {ModernTheme.COLORS['accent_blue'].name()};
-    }}
-    
-    /* GroupBox styling */
-    QGroupBox {{
-        color: {ModernTheme.COLORS['text'].name()};
-        font-size: {ModernTheme.FONTS['default_size']}px;
-        font-weight: 500;
-        border: 1px solid {ModernTheme.COLORS['surface1'].name()};
-        border-radius: {ModernTheme.SPACING['border_radius']}px;
-        margin-top: 10px;
-        padding-top: 10px;
-    }}
-    
-    QGroupBox::title {{
-        color: {ModernTheme.COLORS['text'].name()};
-        subcontrol-origin: margin;
-        left: 10px;
-        padding: 0 8px 0 8px;
-        background-color: {ModernTheme.COLORS['background'].name()};
-    }}
-    
-    /* Modern Context Menu Styling */
-    QMenu {{
-        background-color: {ModernTheme.COLORS['surface0'].name()};
-        border: 1px solid {ModernTheme.COLORS['surface1'].name()};
-        border-radius: {ModernTheme.SPACING['border_radius']}px;
-        color: {ModernTheme.COLORS['text'].name()};
-        font-size: {ModernTheme.FONTS['default_size']}px;
-        padding: 2px 0px;
-        min-width: 150px;
-    }}
-    
-    QMenu::item {{
-        background-color: transparent;
-        color: {ModernTheme.COLORS['text'].name()};
-        padding: {ModernTheme.SPACING['medium']}px {ModernTheme.SPACING['large']}px;
-        border: 1px solid transparent;
-        border-radius: {ModernTheme.SPACING['border_radius']}px;
-        margin: 0px 2px;
-    }}
-    
-    QMenu::item:hover {{
-        background-color: {ModernTheme.COLORS['accent_blue'].name()};
-        color: {ModernTheme.COLORS['background'].name()};
-        border: 1px solid {ModernTheme.COLORS['accent_blue'].lighter(120).name()};
-        border-radius: {ModernTheme.SPACING['border_radius']}px;
-    }}
-    
-    QMenu::item:selected {{
-        background-color: {ModernTheme.COLORS['accent_blue'].name()};
-        color: {ModernTheme.COLORS['background'].name()};
-        border: 1px solid {ModernTheme.COLORS['accent_blue'].lighter(120).name()};
-        border-radius: {ModernTheme.SPACING['border_radius']}px;
-    }}
-    
-    QMenu::item:pressed {{
-        background-color: {ModernTheme.COLORS['accent_blue'].darker(110).name()};
-        color: {ModernTheme.COLORS['background'].name()};
-    }}
-    
-    QMenu::item:disabled {{
-        color: {ModernTheme.COLORS['text_disabled'].name()};
-        background-color: transparent;
-    }}
-    
-    QMenu::separator {{
-        height: 1px;
-        background-color: {ModernTheme.COLORS['surface1'].name()};
-        margin: {ModernTheme.SPACING['small']}px {ModernTheme.SPACING['medium']}px;
-    }}
-        """ 
-
-def get_context_menu_stylesheet():
-    """Get stylesheet for context menus with modern styling"""
-    return f"""
-        QMenu {{
-            background-color: {ModernTheme.COLORS['surface0'].name()};
-            border: 1px solid {ModernTheme.COLORS['surface1'].name()};
-            border-radius: {ModernTheme.SPACING['border_radius']}px;
-            color: {ModernTheme.COLORS['text'].name()};
-            font-size: {ModernTheme.FONTS['default_size']}px;
-            padding: 0px;
-        }}
+        }
         
-        QMenu::item {{
-            background-color: transparent;
-            color: {ModernTheme.COLORS['text'].name()};
-            padding: {ModernTheme.SPACING['medium']}px {ModernTheme.SPACING['large']}px;
-            border: none;
-            margin: 0px;
-        }}
+        QComboBox::down-arrow {
+            image: url(:/icons/down_arrow.png);
+            width: 12px;
+            height: 12px;
+        }
         
-        QMenu::item:hover {{
-            background-color: {ModernTheme.COLORS['accent_red'].name()};
-            color: {ModernTheme.COLORS['background'].name()};
-        }}
+        QComboBox QAbstractItemView {
+            background-color: #24283b;
+            color: #ffffff;
+            selection-background-color: #414868;
+        }
         
-        QMenu::item:selected {{
-            background-color: {ModernTheme.COLORS['accent_red'].name()};
-            color: {ModernTheme.COLORS['background'].name()};
-        }}
+        QPushButton {
+            background-color: #24283b;
+            color: #ffffff;
+            border: 1px solid #414868;
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-size: 14px;
+        }
         
-        QMenu::item:pressed {{
-            background-color: {ModernTheme.COLORS['accent_red'].darker(110).name()};
-            color: {ModernTheme.COLORS['background'].name()};
-        }}
+        QPushButton:hover {
+            background-color: #414868;
+        }
         
-        QMenu::item:disabled {{
-            color: {ModernTheme.COLORS['text_disabled'].name()};
-            background-color: transparent;
-        }}
+        QPushButton:pressed {
+            background-color: #565f89;
+        }
         
-        QMenu::separator {{
-            height: 1px;
-            background-color: {ModernTheme.COLORS['surface1'].name()};
-            margin: {ModernTheme.SPACING['small']}px {ModernTheme.SPACING['medium']}px;
-        }}
+        QPushButton:disabled {
+            background-color: #1a1b26;
+            color: #565f89;
+            border-color: #24283b;
+        }
+        
+        QPushButton#attachBtn {
+            background-color: #7aa2f7;
+            border-color: #7aa2f7;
+        }
+        
+        QPushButton#attachBtn:hover {
+            background-color: #89b4fa;
+            border-color: #89b4fa;
+        }
+        
+        QPushButton#clearSelectedBtn {
+            background-color: #f7768e;
+            border-color: #f7768e;
+        }
+        
+        QPushButton#clearSelectedBtn:hover {
+            background-color: #ff7a93;
+            border-color: #ff7a93;
+        }
+        
+        QPushButton#clearAllBtn {
+            background-color: #db4b4b;
+            border-color: #db4b4b;
+        }
+        
+        QPushButton#clearAllBtn:hover {
+            background-color: #e64553;
+            border-color: #e64553;
+        }
+        
+        QPushButton#attachImageBtn {
+            background-color: #9ece6a;
+            border-color: #9ece6a;
+        }
+        
+        QPushButton#attachImageBtn:hover {
+            background-color: #a9e37c;
+            border-color: #a9e37c;
+        }
+        
+        QPushButton#clearImagesBtn {
+            background-color: #f7768e;
+            border-color: #f7768e;
+        }
+        
+        QPushButton#clearImagesBtn:hover {
+            background-color: #ff7a93;
+            border-color: #ff7a93;
+        }
+        
+        QPushButton#saveImageBtn {
+            background-color: #bb9af7;
+            border-color: #bb9af7;
+        }
+        
+        QPushButton#saveImageBtn:hover {
+            background-color: #c6a2ff;
+            border-color: #c6a2ff;
+        }
+        
+        QPushButton#sendBtn {
+            background-color: #9ece6a;
+            border-color: #9ece6a;
+        }
+        
+        QPushButton#sendBtn:hover {
+            background-color: #a9e37c;
+            border-color: #a9e37c;
+        }
+        
+        QPushButton#closeBtn {
+            background-color: #414868;
+            border-color: #565f89;
+        }
+        
+        QPushButton#closeBtn:hover {
+            background-color: #565f89;
+            border-color: #414868;
+        }
+        
+        QCheckBox {
+            color: #ffffff;
+            font-size: 14px;
+        }
+        
+        QCheckBox::indicator {
+            width: 16px;
+            height: 16px;
+            border: 1px solid #414868;
+            border-radius: 3px;
+            background-color: #24283b;
+        }
+        
+        QCheckBox::indicator:checked {
+            background-color: #7aa2f7;
+            border-color: #7aa2f7;
+        }
+        
+        QCheckBox::indicator:hover {
+            border-color: #565f89;
+        }
+        
+        #warningLabel {
+            color: #e0af68;
+            font-style: italic;
+        }
+        
+        #infoLabel {
+            color: #9aa5ce;
+        }
     """
 
-def get_file_dialog_stylesheet():
-    """File dialog stylesheet with comprehensive dark theme"""
-    return f"""
-    QDialog {{
-        background-color: {ModernTheme.COLORS['background'].name()};
-        color: {ModernTheme.COLORS['text'].name()};
-        font-family: {ModernTheme.FONTS['family']};
-        font-size: {ModernTheme.FONTS['default_size']}px;
-    }}
-    
-    QLabel {{
-        color: {ModernTheme.COLORS['text'].name()};
-        font-size: {ModernTheme.FONTS['default_size']}px;
-        background: transparent;
-    }}
-    
-    QLineEdit {{
-        background-color: {ModernTheme.COLORS['surface0'].name()};
-        border: 1px solid {ModernTheme.COLORS['surface1'].name()};
-        border-radius: {ModernTheme.SPACING['border_radius']}px;
-        padding: {ModernTheme.SPACING['medium']}px;
-        color: {ModernTheme.COLORS['text'].name()};
-        font-size: {ModernTheme.FONTS['default_size']}px;
-    }}
-    
-    QLineEdit:focus {{
-        border: 2px solid {ModernTheme.COLORS['accent_blue'].name()};
-    }}
-    
-    QPushButton {{
-        background-color: {ModernTheme.COLORS['accent_blue'].name()};
-        color: {ModernTheme.COLORS['background'].name()};
-        border: none;
-        border-radius: {ModernTheme.SPACING['border_radius']}px;
-        padding: {ModernTheme.SPACING['medium']}px {ModernTheme.SPACING['large']}px;
-        font-size: {ModernTheme.FONTS['default_size']}px;
-        font-weight: 500;
-        min-width: 80px;
-    }}
-    
-    QPushButton:hover {{
-        background-color: {ModernTheme.COLORS['accent_blue'].lighter(110).name()};
-    }}
-    
-    QPushButton:pressed {{
-        background-color: {ModernTheme.COLORS['accent_blue'].darker(110).name()};
-    }}
-    
-    QPushButton:disabled {{
-        background-color: {ModernTheme.COLORS['surface1'].name()};
-        color: {ModernTheme.COLORS['text_disabled'].name()};
-    }}
-    
-    /* Semantic button variants for file dialog - HIGH PRIORITY */
-    QPushButton[button-type="success"] {{
-        background-color: {ModernTheme.COLORS['success'].name()} !important;
-        color: {ModernTheme.COLORS['background'].name()} !important;
-        border: none !important;
-    }}
-    
-    QPushButton[button-type="success"]:hover {{
-        background-color: {ModernTheme.COLORS['success'].lighter(110).name()} !important;
-    }}
-    
-    QPushButton[button-type="success"]:pressed {{
-        background-color: {ModernTheme.COLORS['success'].darker(110).name()} !important;
-    }}
-    
-    QPushButton[button-type="warning"] {{
-        background-color: {ModernTheme.COLORS['warning'].name()} !important;
-        color: {ModernTheme.COLORS['background'].name()} !important;
-        border: none !important;
-    }}
-    
-    QPushButton[button-type="warning"]:hover {{
-        background-color: {ModernTheme.COLORS['warning'].lighter(110).name()} !important;
-    }}
-    
-    QPushButton[button-type="warning"]:pressed {{
-        background-color: {ModernTheme.COLORS['warning'].darker(110).name()} !important;
-    }}
-    
-    QPushButton[button-type="danger"] {{
-        background-color: {ModernTheme.COLORS['error'].name()} !important;
-        color: {ModernTheme.COLORS['background'].name()} !important;
-        border: none !important;
-    }}
-    
-    QPushButton[button-type="danger"]:hover {{
-        background-color: {ModernTheme.COLORS['error'].lighter(110).name()} !important;
-    }}
-    
-    QPushButton[button-type="danger"]:pressed {{
-        background-color: {ModernTheme.COLORS['error'].darker(110).name()} !important;
-    }}
-    
-    QPushButton[button-type="info"] {{
-        background-color: {ModernTheme.COLORS['info'].name()} !important;
-        color: {ModernTheme.COLORS['background'].name()} !important;
-        border: none !important;
-    }}
-    
-    QPushButton[button-type="info"]:hover {{
-        background-color: {ModernTheme.COLORS['info'].lighter(110).name()} !important;
-    }}
-    
-    QPushButton[button-type="info"]:pressed {{
-        background-color: {ModernTheme.COLORS['info'].darker(110).name()} !important;
-    }}
-    
-    QPushButton[button-type="special"] {{
-        background-color: {ModernTheme.COLORS['accent_mauve'].name()} !important;
-        color: {ModernTheme.COLORS['background'].name()} !important;
-        border: none !important;
-    }}
-    
-    QPushButton[button-type="special"]:hover {{
-        background-color: {ModernTheme.COLORS['accent_mauve'].lighter(110).name()} !important;
-    }}
-    
-    QPushButton[button-type="special"]:pressed {{
-        background-color: {ModernTheme.COLORS['accent_mauve'].darker(110).name()} !important;
-    }}
-    
-    /* Secondary button variant */
-    QPushButton[button-type="secondary"] {{
-        background-color: {ModernTheme.COLORS['surface1'].name()} !important;
-        color: {ModernTheme.COLORS['text'].name()} !important;
-        border: 1px solid {ModernTheme.COLORS['surface2'].name()} !important;
-    }}
-    
-    QPushButton[button-type="secondary"]:hover {{
-        background-color: {ModernTheme.COLORS['surface2'].name()} !important;
-        border: 1px solid {ModernTheme.COLORS['accent_blue'].name()} !important;
-    }}
-    
-    QPushButton[button-type="secondary"]:pressed {{
-        background-color: {ModernTheme.COLORS['surface0'].name()} !important;
-    }}
-    
-    QListWidget {{
-        background-color: {ModernTheme.COLORS['surface0'].name()};
-        border: 1px solid {ModernTheme.COLORS['surface1'].name()};
-        border-radius: {ModernTheme.SPACING['border_radius']}px;
-        color: {ModernTheme.COLORS['text'].name()};
-        font-size: {ModernTheme.FONTS['default_size']}px;
-        alternate-background-color: {ModernTheme.COLORS['surface0'].name()};
-    }}
-    
-    QListWidget::item {{
-        padding: {ModernTheme.SPACING['medium']}px;
-        border: 1px solid transparent;
-        border-bottom: 1px solid {ModernTheme.COLORS['surface1'].name()};
-        color: {ModernTheme.COLORS['text'].name()};
-        border-radius: {ModernTheme.SPACING['border_radius']}px;
-    }}
-    
-    QListWidget::item:hover {{
-        background-color: {ModernTheme.COLORS['surface1'].name()};
-        color: {ModernTheme.COLORS['text'].name()};
-        border: 1px solid {ModernTheme.COLORS['accent_blue'].name()};
-        border-radius: {ModernTheme.SPACING['border_radius']}px;
-    }}
-    
-    QListWidget::item:selected {{
-        background-color: {ModernTheme.COLORS['accent_blue'].name()};
-        border: 1px solid {ModernTheme.COLORS['accent_blue'].darker(120).name()};
-        color: {ModernTheme.COLORS['background'].name()};
-        border-radius: {ModernTheme.SPACING['border_radius']}px;
-    }}
-    
-    QListWidget::item:selected:hover {{
-        background-color: {ModernTheme.COLORS['accent_blue'].lighter(110).name()};
-        border: 1px solid {ModernTheme.COLORS['accent_blue'].darker(120).name()};
-        color: {ModernTheme.COLORS['background'].name()};
-        border-radius: {ModernTheme.SPACING['border_radius']}px;
-    }}
-    
-    /* TreeView styling for file browser */
-    QTreeView {{
-        background-color: {ModernTheme.COLORS['surface0'].name()};
-        border: 1px solid {ModernTheme.COLORS['surface1'].name()};
-        border-radius: {ModernTheme.SPACING['border_radius']}px;
-        color: {ModernTheme.COLORS['text'].name()};
-        font-size: {ModernTheme.FONTS['default_size']}px;
-        selection-background-color: transparent;
-        show-decoration-selected: 0;
-        alternate-background-color: {ModernTheme.COLORS['surface1'].name()};
-    }}
-    
-    QTreeView::item {{
-        height: {ModernTheme.SPACING['item_height']}px;
-        padding: {ModernTheme.SPACING['small']}px;
-        border: none;
-        margin: 1px 4px;
-        border-radius: {ModernTheme.SPACING['border_radius']}px;
-        color: {ModernTheme.COLORS['text'].name()};
-    }}
-    
-    QTreeView::item:hover {{
-        background-color: {ModernTheme.COLORS['hover'].name()};
-        color: {ModernTheme.COLORS['text'].name()};
-    }}
-    
-    QTreeView::item:selected {{
-        background-color: transparent;
-        color: {ModernTheme.COLORS['text'].name()};
-    }}
-    
-
-    
-    QHeaderView::section {{
-        background-color: {ModernTheme.COLORS['surface1'].name()};
-        color: {ModernTheme.COLORS['text'].name()};
-        border: none;
-        padding: {ModernTheme.SPACING['medium']}px;
-        font-weight: 500;
-    }}
-    
-    /* Scrollbars */
-    QScrollBar:vertical {{
-        background-color: {ModernTheme.COLORS['surface0'].name()};
-        width: 18px;
-        border-radius: 9px;
-        margin: 2px;
-        border: 1px solid {ModernTheme.COLORS['surface1'].name()};
-    }}
-    
-    QScrollBar::handle:vertical {{
-        background-color: {ModernTheme.COLORS['surface2'].name()};
-        border-radius: 7px;
-        min-height: 30px;
-        margin: 2px;
-        border: 1px solid {ModernTheme.COLORS['surface1'].name()};
-    }}
-    
-    QScrollBar::handle:vertical:hover {{
-        background-color: {ModernTheme.COLORS['text_secondary'].name()};
-    }}
-    
-    QScrollBar::add-line:vertical,
-    QScrollBar::sub-line:vertical {{
-        height: 0;
-    }}
-    
-    QScrollBar:horizontal {{
-        background-color: {ModernTheme.COLORS['surface0'].name()};
-        height: 12px;
-        border-radius: 6px;
-        margin: 0;
-    }}
-    
-    QScrollBar::handle:horizontal {{
-        background-color: #a855f7;
-        border-radius: 6px;
-        min-width: 40px;
-        margin: 2px;
-        border: 1px solid #c084fc;
-    }}
-    
-    QScrollBar::handle:horizontal:hover {{
-        background-color: {ModernTheme.COLORS['text_secondary'].name()};
-    }}
-    
-    QScrollBar::add-line:horizontal,
-    QScrollBar::sub-line:horizontal {{
-        width: 0;
-    }}
-    
-    /* GroupBox styling */
-    QGroupBox {{
-        color: {ModernTheme.COLORS['text'].name()};
-        font-size: {ModernTheme.FONTS['default_size']}px;
-        font-weight: 500;
-        border: 1px solid {ModernTheme.COLORS['surface1'].name()};
-        border-radius: {ModernTheme.SPACING['border_radius']}px;
-        margin-top: 10px;
-            padding-top: 10px;
-    }}
-    
-    QGroupBox::title {{
-        color: {ModernTheme.COLORS['text'].name()};
-            subcontrol-origin: margin;
-            left: 10px;
-        padding: 0 8px 0 8px;
-        background-color: {ModernTheme.COLORS['background'].name()};
-    }}
-    
-
-    """ 
+def get_main_input_textedit_stylesheet():
+    """Get input text edit stylesheet"""
+    return """
+        QTextEdit {
+            background-color: #2d2d2d;
+            color: #ffffff;
+            border: 1px solid #3d3d3d;
+            border-radius: 4px;
+            padding: 8px;
+            font-size: 14px;
+            selection-background-color: #264f78;
+        }
+        
+        QTextEdit:focus {
+            border-color: #4d4d4d;
+        }
+    """
 
 def get_file_container_stylesheet():
-    """Get stylesheet for file list container"""
-    return f"""
-    QFrame {{
-        background-color: {ModernTheme.COLORS['surface0'].name()};
-        border: 1px solid {ModernTheme.COLORS['surface1'].name()};
-        border-radius: {ModernTheme.SPACING['border_radius'] * 2}px;
-        margin: 4px 2px;
-    }}
+    """Get file container stylesheet"""
+    return """
+        QWidget {
+            background-color: #2d2d2d;
+            border: 2px dashed #3d3d3d;
+            border-radius: 4px;
+        }
     """
 
 def get_file_placeholder_stylesheet():
-    """Get stylesheet for file placeholder label"""
-    return f"""
-    QLabel {{
-        color: {ModernTheme.COLORS['text_secondary'].name()};
-        font-style: italic;
-        font-size: {ModernTheme.FONTS['default_size']}px;
-        font-weight: 500;
-        padding: 2px;
-        border: 2px dashed {ModernTheme.COLORS['text_disabled'].name()};
-        border-radius: 10px;
-        background-color: rgba({ModernTheme.COLORS['surface0'].red()}, {ModernTheme.COLORS['surface0'].green()}, {ModernTheme.COLORS['surface0'].blue()}, 0.3);
-        margin: 2px;
-    }}
-    QLabel:hover {{
-        color: {ModernTheme.COLORS['text'].name()};
-        border-color: {ModernTheme.COLORS['accent_blue'].name()};
-        background-color: rgba({ModernTheme.COLORS['accent_blue'].red()}, {ModernTheme.COLORS['accent_blue'].green()}, {ModernTheme.COLORS['accent_blue'].blue()}, 0.1);
-    }}
+    """Get file placeholder stylesheet"""
+    return """
+        QLabel {
+            color: #8b949e;
+            font-size: 14px;
+            font-style: italic;
+        }
+    """
+
+def get_file_list_stylesheet():
+    """Get file list stylesheet"""
+    return """
+        QListWidget {
+            background-color: #2d2d2d;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            padding: 4px;
+            font-size: 14px;
+        }
+        
+        QListWidget::item {
+            background-color: #2d2d2d;
+            color: #ffffff;
+            border-radius: 2px;
+            padding: 4px;
+        }
+        
+        QListWidget::item:selected {
+            background-color: #264f78;
+        }
+        
+        QListWidget::item:hover {
+            background-color: #3d3d3d;
+        }
+    """
+
+def get_context_menu_stylesheet():
+    """Get context menu stylesheet"""
+    return """
+        QMenu {
+            background-color: #2d2d2d;
+            color: #ffffff;
+            border: 1px solid #3d3d3d;
+            border-radius: 4px;
+            padding: 4px;
+        }
+        
+        QMenu::item {
+            background-color: transparent;
+            padding: 4px 8px;
+        }
+        
+        QMenu::item:selected {
+            background-color: #264f78;
+        }
+        
+        QMenu::separator {
+            height: 1px;
+            background-color: #3d3d3d;
+            margin: 4px 0;
+        }
     """
 
 def get_image_container_stylesheet():
@@ -1089,82 +660,6 @@ def get_image_scroll_stylesheet():
     }}
     QScrollBar::add-page:horizontal,
     QScrollBar::sub-page:horizontal {{
-        background: transparent;
-    }}
-    """
-
-def get_file_list_stylesheet():
-    """Get stylesheet for file list widget"""
-    return f"""
-    QListWidget {{
-        background-color: transparent;
-        border: none;
-        border-radius: 8px;
-        padding: 2px;
-        color: {ModernTheme.COLORS['text'].name()};
-        font-family: {ModernTheme.FONTS['family']};
-        font-size: {ModernTheme.FONTS['default_size']}px;
-        outline: none;
-        selection-background-color: transparent;
-    }}
-    QListWidget::item {{
-        padding: 8px 12px;
-        border-radius: {ModernTheme.SPACING['border_radius']}px;
-        margin: 2px 3px;
-        height: 28px;
-        border: 1px solid transparent;
-        background-color: {ModernTheme.COLORS['surface1'].name()};
-        color: {ModernTheme.COLORS['text'].name()};
-        transition: all 0.2s ease;
-    }}
-    QListWidget::item:hover {{
-        background-color: rgba({ModernTheme.COLORS['accent_blue'].red()}, {ModernTheme.COLORS['accent_blue'].green()}, {ModernTheme.COLORS['accent_blue'].blue()}, 0.08);
-        border: 1px solid rgba({ModernTheme.COLORS['accent_blue'].red()}, {ModernTheme.COLORS['accent_blue'].green()}, {ModernTheme.COLORS['accent_blue'].blue()}, 0.3);
-        color: {ModernTheme.COLORS['text'].name()};
-        transform: translateY(-1px);
-    }}
-    QListWidget::item:selected {{
-        background-color: rgba({ModernTheme.COLORS['accent_blue'].red()}, {ModernTheme.COLORS['accent_blue'].green()}, {ModernTheme.COLORS['accent_blue'].blue()}, 0.15);
-        color: {ModernTheme.COLORS['accent_blue'].name()};
-        border: 1px solid {ModernTheme.COLORS['accent_blue'].name()};
-        font-weight: 500;
-    }}
-    QListWidget::item:selected:hover {{
-        background-color: rgba({ModernTheme.COLORS['accent_blue'].red()}, {ModernTheme.COLORS['accent_blue'].green()}, {ModernTheme.COLORS['accent_blue'].blue()}, 0.25);
-        color: {ModernTheme.COLORS['accent_blue'].lighter(110).name()};
-        border: 1px solid {ModernTheme.COLORS['accent_blue'].lighter(110).name()};
-    }}
-    QListWidget::item:!selected:hover {{
-        color: {ModernTheme.COLORS['text'].name()};
-    }}
-    QScrollBar:vertical {{
-        background-color: {ModernTheme.COLORS['surface0'].name()};
-        width: 18px;
-        border-radius: 9px;
-        margin: 2px;
-        border: 1px solid {ModernTheme.COLORS['surface1'].name()};
-    }}
-    QScrollBar::handle:vertical {{
-        background-color: {ModernTheme.COLORS['surface2'].name()};
-        border-radius: 7px;
-        min-height: 30px;
-        margin: 2px;
-        border: 1px solid {ModernTheme.COLORS['surface1'].name()};
-    }}
-    QScrollBar::handle:vertical:hover {{
-        background-color: {ModernTheme.COLORS['accent_blue'].name()};
-        border: 1px solid {ModernTheme.COLORS['accent_blue'].darker(120).name()};
-    }}
-    QScrollBar::handle:vertical:pressed {{
-        background-color: {ModernTheme.COLORS['accent_blue'].darker(110).name()};
-    }}
-    QScrollBar::add-line:vertical,
-    QScrollBar::sub-line:vertical {{
-        height: 0;
-        width: 0;
-    }}
-    QScrollBar::add-page:vertical,
-    QScrollBar::sub-page:vertical {{
         background: transparent;
     }}
     """
@@ -1549,28 +1044,4 @@ def get_image_viewer_close_button_stylesheet():
                 stop:0 #e53e3e, stop:1 #c53030);
             transform: translateY(0px);
         }
-    """ 
-
-def get_main_input_textedit_stylesheet():
-    """Beautiful input textarea styling without scrollbar modifications"""
-    return """
-    /* BEAUTIFUL TEXT EDIT STYLING */
-    PasteImageTextEdit {
-        border: 2px solid #3d4a5c;
-        border-radius: 12px;
-        padding: 15px;
-        background-color: #2a2f3a;
-        color: #e1e5e9;
-        font-size: 14px;
-        font-family: 'Segoe UI', Arial, sans-serif;
-        line-height: 1.4;
-        selection-background-color: #4a9eff;
-        selection-color: white;
-    }
-    
-    PasteImageTextEdit:focus {
-        border: 2px solid #4a9eff;
-        background-color: #2d3440;
-        box-shadow: 0 0 10px rgba(74, 158, 255, 0.3);
-    }
     """ 

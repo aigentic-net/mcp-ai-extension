@@ -17,7 +17,7 @@ def main():
     print("=" * 50)
     
     try:
-        from ai_extension_tool.utils.mcp_config import setup_mcp_config, mcp_config_manager
+        from AI_EXTENSION_tool.utils.mcp_config import setup_mcp_config, mcp_config_manager
         
         # Show current status
         status = mcp_config_manager.get_config_status()

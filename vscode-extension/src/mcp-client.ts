@@ -27,7 +27,7 @@ export class MCPClient {
         console.log('Using existing MCP server infrastructure');
     }
 
-    disconnect(): void {
+    async disconnect(): Promise<void> {
         // No need to disconnect - we don't manage the server connection
         this.isConnected = false;
     }
@@ -43,7 +43,7 @@ export class MCPClient {
 
             // Add attached files section if there are any
             if (attachedFiles.length > 0) {
-                formattedMessage += '\n\n<AI_extension_ATTACHED_FILES>\n';
+                formattedMessage += '\n\n<AI_EXTENSION_ATTACHED_FILES>\n';
                 
                 const folders = attachedFiles.filter(f => f.type === 'folder');
                 const files = attachedFiles.filter(f => f.type === 'file');
@@ -64,26 +64,26 @@ export class MCPClient {
                     formattedMessage += '\n';
                 }
                 
-                formattedMessage += '</AI_extension_ATTACHED_FILES>\n\n';
+                formattedMessage += '</AI_EXTENSION_ATTACHED_FILES>\n\n';
                 
                 // Add workspace information
                 const workspace = this.getCurrentWorkspace();
                 if (workspace) {
                     const workspaceName = workspace.split('/').pop() || 'workspace';
-                    formattedMessage += `<AI_extension_WORKSPACE>${workspaceName}</AI_extension_WORKSPACE>\n`;
+                    formattedMessage += `<AI_EXTENSION_WORKSPACE>${workspaceName}</AI_EXTENSION_WORKSPACE>\n`;
                 }
             }
 
             // Add continue chat flag
-            formattedMessage += `<AI_extension_CONTINUE_CHAT>${continueChat}</AI_extension_CONTINUE_CHAT>\n`;
+            formattedMessage += `<AI_EXTENSION_CONTINUE_CHAT>${continueChat}</AI_EXTENSION_CONTINUE_CHAT>\n`;
 
-            // Use the MCP ai_extension_tool that's available through the ai-extension server
+            // Use the MCP AI_EXTENSION_tool that's available through the ai-extension server
             // The tool will process the message and return a formatted response
             
             return new Promise((resolve) => {
                 // Simulate processing delay
                 setTimeout(() => {
-                    resolve("Extension: Message formatted and ready! The ai_extension_tool from ai-extension server will process this through the MCP protocol.");
+                    resolve("Extension: Message formatted and ready! The AI_EXTENSION_tool from ai-extension server will process this through the MCP protocol.");
                 }, 1000);
             });
 
@@ -102,5 +102,35 @@ export class MCPClient {
 
     isConnectedToServer(): boolean {
         return this.isConnected;
+    }
+
+    public async callAIExtensionTool(
+        message: string,
+        attachedFiles: AttachedFile[],
+        attachedImages: AttachedImage[],
+        workspace: string | undefined
+    ): Promise<string> {
+        // In a real implementation, this would make a request to the MCP server
+        // For this example, we'll simulate the tool's behavior
+        
+        console.log('Calling AI_EXTENSION_tool with:', { message, attachedFiles, attachedImages, workspace });
+
+        // Simulate a network delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Simulate a successful response
+        const response = `
+            <p><strong>Tool Executed Successfully</strong></p>
+            <p>Your message: "${message}"</p>
+            <p>This is a simulated response from the <code>AI_EXTENSION_tool</code>. 
+            In a real scenario, this would contain the actual output of the tool running on the server.</p>
+            <p>Attachments:</p>
+            <ul>
+                ${attachedFiles.map(f => `<li>${f.relativePath} (${f.type})</li>`).join('')}
+                ${attachedImages.map(i => `<li>${i.path} (image)</li>`).join('')}
+            </ul>
+        `;
+
+        return response;
     }
 } 

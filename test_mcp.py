@@ -4,8 +4,8 @@ Test script for MCP AI extension Tool
 Tests both connection and tool functionality
 """
 
-from ai_extension_tool.utils.mcp_config import mcp_config_manager
-from ai_extension_tool.utils.mcp_client import test_mcp_connection_and_tools
+from AI_EXTENSION_tool.utils.mcp_config import mcp_config_manager
+from AI_EXTENSION_tool.utils.mcp_client import test_mcp_connection_and_tools
 
 def main():
     """Main test function"""
@@ -24,7 +24,7 @@ def main():
     print()
     
     # Display server configuration
-    server_config = mcp_config_manager.get_ai_extension_server_config()
+    server_config = mcp_config_manager.get_AI_EXTENSION_server_config()
     if server_config:
         print("🔧 Server Configuration:")
         print(f"  Command: {server_config.get('command', 'N/A')}")

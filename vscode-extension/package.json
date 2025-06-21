@@ -65,7 +65,8 @@
       "aiextension": [
         {
           "id": "aiextensionChat",
-          "name": "AI Chat"
+          "name": "AI Chat",
+          "type": "webview"
         }
       ]
     },

@@ -5,12 +5,12 @@
 ### 1. Standalone Tool Not Launching
 **Problem**: The AI extension Tool didn't launch in standalone mode as expected.
 
-**Root Cause**: The `python -m ai_extension_tool` command was calling the MCP server instead of the UI.
+**Root Cause**: The `python -m AI_EXTENSION_tool` command was calling the MCP server instead of the UI.
 
 **Solution Applied**:
 - Created a direct launcher script: `launch_standalone.py`
 - Use the command: `python launch_standalone.py` to launch the standalone UI
-- Or use: `python -c "from ai_extension_tool.engine import run_ui; run_ui()"`
+- Or use: `python -c "from AI_EXTENSION_tool.engine import run_ui; run_ui()"`
 
 **Verification**: The PyQt5 interface should now open with the full AI extension Tool UI.
 
@@ -45,7 +45,7 @@
 python launch_standalone.py
 
 # Method 2: Direct import
-python -c "from ai_extension_tool.engine import run_ui; run_ui()"
+python -c "from AI_EXTENSION_tool.engine import run_ui; run_ui()"
 ```
 
 #### VS Code Extension
@@ -67,7 +67,7 @@ python -c "from ai_extension_tool.engine import run_ui; run_ui()"
 {
   "aiextension.interfaceMode": "cursor-integration",
   "aiextension.standaloneUIPath": "/Users/hildarayan/Projects/mcp-ai-extension/launch_standalone.py",
-  "aiextension.mcpServerPath": "/Users/hildarayan/Projects/mcp-ai-extension/ai_extension_tool/server.py"
+  "aiextension.mcpServerPath": "/Users/hildarayan/Projects/mcp-ai-extension/AI_EXTENSION_tool/server.py"
 }
 ```
 
@@ -104,13 +104,13 @@ python launch_standalone.py
 python -c "import PyQt5; print('PyQt5 OK')"
 
 # Check module import
-python -c "from ai_extension_tool.engine import run_ui; print('Import OK')"
+python -c "from AI_EXTENSION_tool.engine import run_ui; print('Import OK')"
 
 # Run with error output
 python -c "
 import sys
 try:
-    from ai_extension_tool.engine import run_ui
+    from AI_EXTENSION_tool.engine import run_ui
     run_ui()
 except Exception as e:
     print(f'Error: {e}')
@@ -129,7 +129,7 @@ except Exception as e:
 ```bash
 # Test MCP server directly
 cd /Users/hildarayan/Projects/mcp-ai-extension
-python -m ai_extension_tool.server
+python -m AI_EXTENSION_tool.server
 ```
 
 ## Success Indicators

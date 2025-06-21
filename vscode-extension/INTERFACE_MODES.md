@@ -30,7 +30,7 @@ Add these settings to your VS Code `settings.json`:
 ```json
 {
   "aiextension.interfaceMode": "cursor-integration", // or "standalone"
-  "aiextension.standaloneUIPath": "/path/to/ai_extension_tool/__main__.py",
+  "aiextension.standaloneUIPath": "/path/to/AI_EXTENSION_tool/__main__.py",
   "aiextension.mcpServerPath": "/path/to/mcp/server"
 }
 ```

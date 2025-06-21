@@ -9,7 +9,7 @@ from .response_formatter import (
     build_error_response,
     validate_response_data
 )
-from .mcp_handler import ai_extension_tool, get_tool_description
+from .mcp_handler import AI_EXTENSION_tool, get_tool_description
 
 __all__ = [
     'ConfigManager',
@@ -18,6 +18,6 @@ __all__ = [
     'format_text_only_response', 
     'build_error_response',
     'validate_response_data',
-    'ai_extension_tool',
+    'AI_EXTENSION_tool',
     'get_tool_description'
 ] 

@@ -91,7 +91,7 @@ class MCPConfigManager:
             "mcpServers": {
                 "ai-extension": {
                     "command": "python",
-                    "args": ["-m", "ai_extension_tool.server"],
+                    "args": ["-m", "AI_EXTENSION_tool.server"],
                     "env": {},
                     "disabled": False,
                     "timeout": 60
@@ -99,7 +99,7 @@ class MCPConfigManager:
             }
         }
     
-    def get_ai_extension_server_config(self) -> Optional[Dict]:
+    def get_AI_EXTENSION_server_config(self) -> Optional[Dict]:
         """
         Get AI extension server configuration
         
@@ -109,7 +109,7 @@ class MCPConfigManager:
         servers = self.config.get('mcpServers', {})
         
         # Look for ai-extension server with various possible names
-        possible_names = ['ai-extension', 'ai_extension', 'aiextension', 'AI extension']
+        possible_names = ['ai-extension', 'AI_EXTENSION', 'aiextension', 'AI extension']
         
         for name in possible_names:
             if name in servers:
@@ -139,7 +139,7 @@ class MCPConfigManager:
         Returns:
             Tuple[str, List[str]]: (command, args)
         """
-        server_config = self.get_ai_extension_server_config()
+        server_config = self.get_AI_EXTENSION_server_config()
         
         if server_config:
             command = server_config.get('command', 'mcp-server-ai-extension')
@@ -173,7 +173,7 @@ class MCPConfigManager:
                     "ai-extension": {
                         "command": "python",
                         "args": [
-                            "-m", "ai_extension_tool.server"
+                            "-m", "AI_EXTENSION_tool.server"
                         ],
                         "env": {
                             "PYTHONPATH": str(Path(__file__).parent.parent.parent)
@@ -244,7 +244,7 @@ class MCPConfigManager:
             config['mcpServers']['ai-extension'] = {
                 "command": "python",
                 "args": [
-                    "-m", "ai_extension_tool.server"
+                    "-m", "AI_EXTENSION_tool.server"
                 ],
                 "env": {
                     "PYTHONPATH": str(Path(__file__).parent.parent.parent)
@@ -321,7 +321,7 @@ def get_mcp_server_config() -> Dict:
     Returns:
         Dict: MCP server configuration
     """
-    return mcp_config_manager.get_ai_extension_server_config()
+    return mcp_config_manager.get_AI_EXTENSION_server_config()
 
 
 def setup_mcp_config() -> bool:
