@@ -11,7 +11,7 @@ export function activate(context: vscode.ExtensionContext) {
     console.log('AI extension extension is now active!');
 
     // Initialize components
-    mcpClient = new MCPClient();
+    mcpClient = new MCPClient('http://localhost:8000');
     fileManager = new FileManager(context);
     chatPanelProvider = new ChatPanelProvider(context, mcpClient, fileManager);
 

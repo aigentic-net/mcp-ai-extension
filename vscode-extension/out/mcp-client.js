@@ -3,8 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MCPClient = void 0;
 const vscode = require("vscode");
 class MCPClient {
-    constructor() {
+    constructor(baseUrl) {
         this.isConnected = false;
+        this.baseUrl = baseUrl;
         // The MCP server is already running and managed by the IDE's mcp.json configuration
         // We don't need to establish our own connection
         this.isConnected = true;
@@ -18,31 +19,44 @@ class MCPClient {
         // No need to disconnect - we don't manage the server connection
         this.isConnected = false;
     }
-    async sendMessage(message, attachedFiles = [], attachedImages = [], continueChat = false) {
+    async sendMessage(message, files, images, continueChat, language = 'en' // Default to English if not specified
+    ) {
         if (!this.isConnected) {
             throw new Error('MCP client not initialized');
         }
-        try {
-            const config = vscode.workspace.getConfiguration('aiextension');
-            const command = config.get('mcpToolName', 'mcp_ai-extension_ai_extension_tool');
-            const args = {
-                message: message,
-                attached_files: attachedFiles.map(f => f.fullPath),
-                attached_images: attachedImages.map(img => ({
-                    path: img.path,
-                    base64: img.base64,
-                    mediaType: img.mediaType
-                })),
-                workspace: this.getCurrentWorkspace(),
+        const endpoint = `${this.baseUrl}/run_tool`;
+        const payload = {
+            tool_name: 'mcp_ai_extension',
+            params: {
+                message,
+                files,
+                images,
                 continue_chat: continueChat,
-            };
-            const result = await vscode.commands.executeCommand(command, args);
+                language: language,
+                workspace: this.getCurrentWorkspace()
+            }
+        };
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const result = await response.json();
             if (typeof result === 'string') {
                 return result;
             }
-            if (typeof result === 'object' && result !== null && 'error' in result) {
-                const errorResult = result;
-                throw new Error(`Tool returned an error: ${errorResult.error}`);
+            if (typeof result === 'object' && result !== null) {
+                if ('error' in result) {
+                    const errorResult = result;
+                    throw new Error(`Tool returned an error: ${errorResult.error}`);
+                }
+                return result; // Return the object as-is if it's a valid response
             }
             throw new Error(`Received unexpected response type from tool: ${typeof result}`);
         }

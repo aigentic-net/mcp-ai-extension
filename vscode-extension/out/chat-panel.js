@@ -53,17 +53,23 @@ class ChatPanelProvider {
     }
     restoreState() {
         if (this._view) {
+            const selectedLanguage = this._context.workspaceState.get('selectedLanguage', 'en');
             this._postMessage({
                 type: 'restoreState',
                 text: this._lastMessage,
-                continueChat: this._continueChat
+                continueChat: this._continueChat,
+                language: selectedLanguage
             });
         }
     }
     _handleWebviewMessage(message) {
         switch (message.type) {
             case 'sendMessage':
-                this._handleSendMessage(message.text, message.continueChat);
+                this._handleSendMessage(message.text, message.continueChat, message.language);
+                break;
+            case 'languageChange':
+                // Store the selected language in workspace state
+                this._context.workspaceState.update('selectedLanguage', message.language);
                 break;
             case 'attachFile':
                 this._handleAttachFile();
@@ -91,16 +97,15 @@ class ChatPanelProvider {
                 break;
         }
     }
-    async _handleSendMessage(text, continueChat) {
+    async _handleSendMessage(text, continueChat, language = 'en') {
         if (!text.trim() && this._fileManager.getAttachmentCount() === 0) {
-            // No need to post a message back, the UI state doesn't change.
             vscode.window.showWarningMessage('No message or attachments to send.');
             return;
         }
         try {
             const files = this._fileManager.getAttachedFiles();
             const images = this._fileManager.getAttachedImages();
-            const response = await this._mcpClient.sendMessage(text, files, images, continueChat);
+            const response = await this._mcpClient.sendMessage(text, files, images, continueChat, language);
             // On success, clear attachments and the persisted message state
             this._lastMessage = '';
             this._fileManager.clearAllAttachments();
@@ -109,7 +114,6 @@ class ChatPanelProvider {
             vscode.window.showInformationMessage(`AI Response: ${response}`);
         }
         catch (error) {
-            // On error, notify the UI to reset its sending state without clearing anything.
             this._postMessage({ type: 'messageSentError' });
             const errorMessage = error instanceof Error ? error.message : 'Unknown error';
             vscode.window.showErrorMessage(vscode.l10n.t('Error sending message: {0}', errorMessage));
@@ -219,65 +223,74 @@ class ChatPanelProvider {
         const stylesMainUri = webview.asWebviewUri(vscode.Uri.joinPath(this._context.extensionUri, 'media', 'main.css'));
         const nonce = this._getNonce();
         return `<!DOCTYPE html>
-			<html lang="en">
-			<head>
-				<meta charset="UTF-8">
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
                 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
-				<meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <link href="${stylesMainUri}" rel="stylesheet">
-				<title>AI Chat</title>
-			</head>
-			<body>
+                <title>AI Chat</title>
+            </head>
+            <body>
                 <div class="container">
                     <div class="language-selector">
                         <label>Language:</label>
-                        <button class="lang-btn active">English</button>
+                        <select id="language-select" class="language-select">
+                            <option value="en" selected>English</option>
+                            <option value="vi">Vietnamese</option>
+                        </select>
                     </div>
 
-                    <p class="info-text">Type your message and press 'Send' or Ctrl+Enter to send. You can also attach files.</p>
-
-                    <textarea id="message-input" class="message-input" placeholder="hello i am your pair programmer, this is what your ai_extension_tool user interface is supposed to look like view the attached image:" aria-label="Message Input"></textarea>
+                    <textarea id="message-input" class="message-input" placeholder="Type your message here..." aria-label="Message Input"></textarea>
 
                     <div class="buttons-container">
                         <div class="file-buttons">
-                            <button id="attach-file-btn" class="btn" aria-label="Attach file or folder">Attach file</button>
-                            <button id="clear-selected-btn" class="btn" aria-label="Clear selected files">Clear Selected</button>
-                            <button id="clear-all-btn" class="btn" aria-label="Clear all attachments">Clear All</button>
+                            <button id="attach-file-btn" class="btn">Attach file</button>
+                            <button id="clear-selected-btn" class="btn">Clear Selected</button>
+                            <button id="clear-all-btn" class="btn">Clear All</button>
                         </div>
                         <div class="image-buttons">
-                            <button id="attach-image-btn" class="btn" aria-label="Attach an image">Attach Image</button>
-                            <button id="clear-images-btn" class="btn" aria-label="Clear all image attachments">Clear Images</button>
-                            <button id="save-image-btn" class="btn" aria-label="Save attached image">Save Image</button>
+                            <button id="attach-image-btn" class="btn">Attach Image</button>
+                            <button id="clear-images-btn" class="btn">Clear Images</button>
+                            <button id="save-image-btn" class="btn">Save Image</button>
                         </div>
                     </div>
 
                     <div class="drop-zones-container">
-                        <div id="file-drop-zone" class="drop-zone" role="button" aria-label="Attach files and folders drop zone">
-                            <span>Drag & drop files/folders here or click 'Attach File' button</span>
-                            <div id="file-list" class="attachment-list"></div>
+                        <div class="drop-zone-wrapper">
+                            <div id="file-drop-zone" class="drop-zone" role="button">
+                                <div class="drop-zone-content">
+                                    <span class="drop-zone-text">Drag & drop files/folders here or click 'Attach File' button</span>
+                                    <div id="file-list" class="attachment-list"></div>
+                                </div>
+                            </div>
                         </div>
-                        <div id="image-drop-zone" class="drop-zone image-drop-zone" role="button" aria-label="Attach images drop zone">
-                            <span>Drag & drop images here or click here to select images</span>
-                            <div id="image-list" class="attachment-list"></div>
+                        <div class="drop-zone-wrapper">
+                            <div id="image-drop-zone" class="drop-zone" role="button">
+                                <div class="drop-zone-content">
+                                    <span class="drop-zone-text">Drag & drop images here or click here to select images</span>
+                                    <div id="image-list" class="attachment-list"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="continue-container">
-                        <input type="checkbox" id="continue-checkbox" />
-                        <label for="continue-checkbox">Continue conversation</label>
+                        <label class="continue-label">
+                            <input type="checkbox" id="continue-checkbox" class="continue-checkbox" />
+                            <span>Continue conversation</span>
+                        </label>
+                        <div class="note">NOTE: If continue conversation is checked, Agent MUST call this tool again!</div>
                     </div>
-                    
-                    <p class="note-text">NOTE: If continue conversation is checked, Agent MUST call this tool again!</p>
 
                     <div class="bottom-buttons">
-                        <button id="send-btn" class="btn send-btn" aria-label="Send message to AI">Send</button>
-                        <button id="close-btn" class="btn close-btn" aria-label="Close extension panel">Close</button>
+                        <button id="send-btn" class="btn primary">Send</button>
+                        <button id="close-btn" class="btn secondary">Close</button>
                     </div>
                 </div>
-
-				<script nonce="${nonce}" src="${scriptUri}"></script>
-			</body>
-			</html>`;
+                <script nonce="${nonce}" src="${scriptUri}"></script>
+            </body>
+            </html>`;
     }
     _getNonce() {
         let text = '';

@@ -11,7 +11,7 @@ let fileManager;
 function activate(context) {
     console.log('AI extension extension is now active!');
     // Initialize components
-    mcpClient = new mcp_client_1.MCPClient();
+    mcpClient = new mcp_client_1.MCPClient('http://localhost:8000');
     fileManager = new file_manager_1.FileManager(context);
     chatPanelProvider = new chat_panel_1.ChatPanelProvider(context, mcpClient, fileManager);
     // Set context to show the view

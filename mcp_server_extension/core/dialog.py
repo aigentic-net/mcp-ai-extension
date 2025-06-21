@@ -828,6 +828,7 @@ class InputDialog(QtWidgets.QDialog):
         self.result_text = text
         self.result_continue = continue_chat
         self.result_ready = True
+        
         # Close dialog
         self.accept()
     
