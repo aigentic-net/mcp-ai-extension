@@ -55,7 +55,8 @@ export class MCPClient {
                 images,
                 continue_chat: continueChat,
                 language: language,
-                workspace: this.getCurrentWorkspace()
+                workspace: this.getCurrentWorkspace(),
+                use_vscode_ui: true  // Always use VS Code UI when called from extension
             }
         };
 

@@ -13,10 +13,13 @@ from .response_formatter import (
 )
 
 
-def AI_EXTENSION_tool() -> List:
+def AI_EXTENSION_tool(use_vscode_ui: bool = False) -> List:
     """
     Main AI Interactive tool function with image support
     Returns mixed content using modular response formatting
+    
+    Args:
+        use_vscode_ui: If True, uses VS Code extension UI instead of standalone window
     
     This function handles:
     - Running the UI dialog
@@ -28,7 +31,13 @@ def AI_EXTENSION_tool() -> List:
         List containing TextContent and/or MCPImage objects
     """
     try:
-        result = run_ui()
+        if use_vscode_ui:
+            # Use VS Code extension UI
+            from ..vscode_engine import run_vscode_ui
+            result = run_vscode_ui()
+        else:
+            # Use standalone PyQt5 UI
+            result = run_ui()
         
         # Validate response data
         is_valid, error_msg = validate_response_data(result)
@@ -53,5 +62,4 @@ def get_tool_description() -> str:
     Returns:
         String containing the tool description
     """
-    from ..description import AI_EXTENSION_DESCRIPTION
-    return AI_EXTENSION_DESCRIPTION 
+    from ..description import AI_EXTENSION_DESCRIPTION 
