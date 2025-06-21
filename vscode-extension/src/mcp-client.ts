@@ -4,6 +4,7 @@ export interface AttachedFile {
     path: string;
     relativePath: string;
     type: 'file' | 'folder';
+    fullPath: string;
 }
 
 export interface AttachedImage {
@@ -14,8 +15,10 @@ export interface AttachedImage {
 
 export class MCPClient {
     private isConnected = false;
+    private baseUrl: string;
 
-    constructor() {
+    constructor(baseUrl: string) {
+        this.baseUrl = baseUrl;
         // The MCP server is already running and managed by the IDE's mcp.json configuration
         // We don't need to establish our own connection
         this.isConnected = true;
@@ -32,63 +35,70 @@ export class MCPClient {
         this.isConnected = false;
     }
 
-    async sendMessage(message: string, attachedFiles: AttachedFile[] = [], attachedImages: AttachedImage[] = [], continueChat: boolean = false): Promise<string> {
+    async sendMessage(
+        message: string, 
+        files: AttachedFile[], 
+        images: AttachedImage[], 
+        continueChat: boolean,
+        language: string = 'en'  // Default to English if not specified
+    ): Promise<any> {
         if (!this.isConnected) {
             throw new Error('MCP client not initialized');
         }
 
-        try {
-            // Format the message according to the AI extension Tool specification
-            let formattedMessage = message;
-
-            // Add attached files section if there are any
-            if (attachedFiles.length > 0) {
-                formattedMessage += '\n\n<AI_EXTENSION_ATTACHED_FILES>\n';
-                
-                const folders = attachedFiles.filter(f => f.type === 'folder');
-                const files = attachedFiles.filter(f => f.type === 'file');
-                
-                if (folders.length > 0) {
-                    formattedMessage += 'FOLDERS:\n';
-                    folders.forEach(folder => {
-                        formattedMessage += `- ${folder.relativePath}\n`;
-                    });
-                    formattedMessage += '\n';
-                }
-                
-                if (files.length > 0) {
-                    formattedMessage += 'FILES:\n';
-                    files.forEach(file => {
-                        formattedMessage += `- ${file.relativePath}\n`;
-                    });
-                    formattedMessage += '\n';
-                }
-                
-                formattedMessage += '</AI_EXTENSION_ATTACHED_FILES>\n\n';
-                
-                // Add workspace information
-                const workspace = this.getCurrentWorkspace();
-                if (workspace) {
-                    const workspaceName = workspace.split('/').pop() || 'workspace';
-                    formattedMessage += `<AI_EXTENSION_WORKSPACE>${workspaceName}</AI_EXTENSION_WORKSPACE>\n`;
-                }
+        const endpoint = `${this.baseUrl}/run_tool`;
+        const payload = {
+            tool_name: 'mcp_ai_extension',
+            params: {
+                message,
+                files,
+                images,
+                continue_chat: continueChat,
+                language: language,
+                workspace: this.getCurrentWorkspace()
             }
+        };
 
-            // Add continue chat flag
-            formattedMessage += `<AI_EXTENSION_CONTINUE_CHAT>${continueChat}</AI_EXTENSION_CONTINUE_CHAT>\n`;
-
-            // Use the MCP AI_EXTENSION_tool that's available through the ai-extension server
-            // The tool will process the message and return a formatted response
-            
-            return new Promise((resolve) => {
-                // Simulate processing delay
-                setTimeout(() => {
-                    resolve("Extension: Message formatted and ready! The AI_EXTENSION_tool from ai-extension server will process this through the MCP protocol.");
-                }, 1000);
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
             });
 
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+
+            if (typeof result === 'string') {
+                return result;
+            }
+
+            if (typeof result === 'object' && result !== null) {
+                if ('error' in result) {
+                    const errorResult = result as { error: string };
+                    throw new Error(`Tool returned an error: ${errorResult.error}`);
+                }
+                return result; // Return the object as-is if it's a valid response
+            }
+            
+            throw new Error(`Received unexpected response type from tool: ${typeof result}`);
+
         } catch (error) {
-            throw new Error(`Failed to send message to MCP server: ${error}`);
+            console.error(`Failed to execute MCP tool call: ${error}`);
+            if (error instanceof Error) {
+                if (error.message.includes('not found')) {
+                    const toolName = vscode.workspace.getConfiguration('aiextension').get('mcpToolName');
+                    vscode.window.showErrorMessage(`AI tool '${toolName}' not found. Please ensure the MCP server is running and the tool is correctly registered.`);
+                    throw new Error(`Configured AI tool not found: ${toolName}`);
+                }
+                throw new Error(`Failed to send message to MCP server: ${error.message}`);
+            }
+            throw new Error(`Failed to send message to MCP server: Unknown error`);
         }
     }
 

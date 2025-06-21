@@ -2,14 +2,20 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import { AttachedFile, AttachedImage } from './mcp-client';
+import { Disposable } from 'vscode';
 
-export class FileManager {
+export class FileManager implements Disposable {
     private attachedFiles: AttachedFile[] = [];
     private attachedImages: AttachedImage[] = [];
     private context: vscode.ExtensionContext;
 
     constructor(context: vscode.ExtensionContext) {
         this.context = context;
+    }
+
+    dispose() {
+        this.clearAllAttachments();
+        console.log("FileManager disposed and attachments cleared.");
     }
 
     attachFile(filePath: string): boolean {
@@ -25,7 +31,8 @@ export class FileManager {
             const attachedFile: AttachedFile = {
                 path: filePath,
                 relativePath: relativePath,
-                type: stat.isDirectory() ? 'folder' : 'file'
+                type: stat.isDirectory() ? 'folder' : 'file',
+                fullPath: filePath
             };
 
             // Check if already attached
@@ -87,6 +94,15 @@ export class FileManager {
             return true;
         }
         return false;
+    }
+
+    clearSelectedFiles(filesToClear: AttachedFile[]): void {
+        const pathsToClear = new Set(filesToClear.map(f => f.path));
+        this.attachedFiles = this.attachedFiles.filter(f => !pathsToClear.has(f.path));
+    }
+
+    clearImages(): void {
+        this.attachedImages = [];
     }
 
     clearAllAttachments(): void {

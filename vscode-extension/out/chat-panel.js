@@ -4,9 +4,20 @@ exports.ChatPanelProvider = void 0;
 const vscode = require("vscode");
 class ChatPanelProvider {
     constructor(context, mcpClient, fileManager) {
+        this._disposables = [];
+        // State to persist
+        this._lastMessage = '';
+        this._continueChat = false;
         this._context = context;
         this._fileManager = fileManager;
         this._mcpClient = mcpClient;
+        this._context.subscriptions.push(this);
+    }
+    dispose() {
+        // Dispose of our disposables
+        this._disposables.forEach(d => d.dispose());
+        // Also dispose of the file manager
+        this._fileManager.dispose();
     }
     resolveWebviewView(webviewView, context, _token) {
         this._view = webviewView;
@@ -17,72 +28,106 @@ class ChatPanelProvider {
             ]
         };
         webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
-        // Handle messages from the webview
-        webviewView.webview.onDidReceiveMessage(message => {
-            switch (message.type) {
-                case 'sendMessage':
-                    this._handleSendMessage(message.text);
-                    break;
-                case 'attachFile':
-                    this._handleAttachFile();
-                    break;
-                case 'attachImage':
-                    this._handleAttachImage();
-                    break;
-                case 'clearAttachments':
-                    this._handleClearAttachments();
-                    break;
-                case 'newConversation':
-                    this._handleNewConversation();
-                    break;
-                case 'copyToClipboard':
-                    this._handleCopyToClipboard(message.text);
-                    break;
+        // Add the message listener to our disposables
+        this._disposables.push(webviewView.webview.onDidReceiveMessage(message => {
+            // Update state on every message or user action
+            if (message.type === 'updateState') {
+                this._lastMessage = message.text;
+                this._continueChat = message.continueChat;
             }
-        }, undefined, this._context.subscriptions);
-        // Update initial state
+            else {
+                this._handleWebviewMessage(message);
+            }
+        }, undefined, this._disposables // Use our own disposables array
+        ));
+        // Restore state when webview becomes visible
+        this._disposables.push(webviewView.onDidChangeVisibility(() => {
+            if (webviewView.visible) {
+                this.updateAttachments();
+                this.restoreState();
+            }
+        }));
+        // Initial state update
         this.updateAttachments();
+        this.restoreState();
     }
-    async _handleSendMessage(text) {
+    restoreState() {
+        if (this._view) {
+            this._postMessage({
+                type: 'restoreState',
+                text: this._lastMessage,
+                continueChat: this._continueChat
+            });
+        }
+    }
+    _handleWebviewMessage(message) {
+        switch (message.type) {
+            case 'sendMessage':
+                this._handleSendMessage(message.text, message.continueChat);
+                break;
+            case 'attachFile':
+                this._handleAttachFile();
+                break;
+            case 'clearSelectedFiles':
+                this._fileManager.clearSelectedFiles(message.files);
+                this.updateAttachments();
+                break;
+            case 'clearAllFiles':
+                this._fileManager.clearAllAttachments();
+                this.updateAttachments();
+                break;
+            case 'attachImage':
+                this._handleAttachImage();
+                break;
+            case 'clearImages':
+                this._fileManager.clearImages();
+                this.updateAttachments();
+                break;
+            case 'saveImage':
+                vscode.window.showInformationMessage('Save Image functionality is not implemented yet.');
+                break;
+            case 'close':
+                vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+                break;
+        }
+    }
+    async _handleSendMessage(text, continueChat) {
         if (!text.trim() && this._fileManager.getAttachmentCount() === 0) {
+            // No need to post a message back, the UI state doesn't change.
             vscode.window.showWarningMessage('No message or attachments to send.');
             return;
         }
         try {
-            const formattedMessage = this._formatMessageForAI(text);
-            await vscode.env.clipboard.writeText(formattedMessage);
-            vscode.window.showInformationMessage('AI context copied to clipboard. Paste it into the main chat.', 'Focus Chat').then(selection => {
-                if (selection === 'Focus Chat') {
-                    vscode.commands.executeCommand('workbench.action.chat.focus');
-                }
-            });
-            this._postMessage({
-                type: 'messageSent',
-                message: 'Context copied!'
-            });
+            const files = this._fileManager.getAttachedFiles();
+            const images = this._fileManager.getAttachedImages();
+            const response = await this._mcpClient.sendMessage(text, files, images, continueChat);
+            // On success, clear attachments and the persisted message state
+            this._lastMessage = '';
+            this._fileManager.clearAllAttachments();
+            this._postMessage({ type: 'messageSentSuccess' });
+            this.updateAttachments();
+            vscode.window.showInformationMessage(`AI Response: ${response}`);
         }
         catch (error) {
+            // On error, notify the UI to reset its sending state without clearing anything.
+            this._postMessage({ type: 'messageSentError' });
             const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            vscode.window.showErrorMessage(`Error preparing message: ${errorMessage}`);
-            this._postMessage({
-                type: 'showError',
-                message: `Error: ${errorMessage}`
-            });
+            vscode.window.showErrorMessage(vscode.l10n.t('Error sending message: {0}', errorMessage));
         }
     }
-    _formatMessageForAI(text) {
+    _formatMessageForAI(text, continueChat) {
         let formattedMessage = text;
         const attachedFiles = this._fileManager.getAttachedFiles();
         if (attachedFiles.length > 0) {
-            formattedMessage += "\n\n<AI_INTERACTIVE_ATTACHED_FILES>\n";
+            formattedMessage += "\n\n<AI_extension_ATTACHED_FILES>\n";
             let workspaceName;
             const folders = attachedFiles.filter(f => f.type === 'folder').map(f => f.relativePath);
             const files = attachedFiles.filter(f => f.type === 'file').map(f => f.relativePath);
             const firstFile = attachedFiles[0];
             if (firstFile) {
-                const parts = firstFile.relativePath.split('/');
-                if (parts.length > 1) {
-                    workspaceName = parts[0];
+                const ws = vscode.workspace.getWorkspaceFolder(vscode.Uri.file(firstFile.fullPath));
+                if (ws) {
+                    workspaceName = ws.name;
                 }
             }
             if (folders.length > 0) {
@@ -97,12 +142,12 @@ class ChatPanelProvider {
                     formattedMessage += `- ${file}\n`;
                 });
             }
-            formattedMessage += "</AI_INTERACTIVE_ATTACHED_FILES>\n";
+            formattedMessage += "</AI_extension_ATTACHED_FILES>\n";
             if (workspaceName) {
-                formattedMessage += `\n<AI_INTERACTIVE_WORKSPACE>${workspaceName}</AI_INTERACTIVE_WORKSPACE>`;
+                formattedMessage += `\n<AI_extension_WORKSPACE>${workspaceName}</AI_extension_WORKSPACE>`;
             }
         }
-        formattedMessage += `\n\n<AI_INTERACTIVE_CONTINUE_CHAT>false</AI_INTERACTIVE_CONTINUE_CHAT>`;
+        formattedMessage += `\n\n<AI_EXTENSION_CONTINUE_CHAT>${continueChat}</AI_EXTENSION_CONTINUE_CHAT>`;
         return formattedMessage;
     }
     async _handleAttachFile() {
@@ -145,23 +190,6 @@ class ChatPanelProvider {
         this.updateAttachments();
         vscode.window.showInformationMessage('All attachments cleared');
     }
-    _handleNewConversation() {
-        this._postMessage({ type: 'clearConversation' });
-        vscode.window.showInformationMessage('Ready for new conversation');
-    }
-    async _handleCopyToClipboard(text) {
-        if (!text.trim()) {
-            return;
-        }
-        try {
-            const formattedMessage = this._formatMessageForAI(text);
-            await vscode.env.clipboard.writeText(formattedMessage);
-            vscode.window.showInformationMessage('Message copied to clipboard!');
-        }
-        catch (error) {
-            vscode.window.showErrorMessage('Failed to copy to clipboard');
-        }
-    }
     _getCurrentWorkspace() {
         const workspaceFolders = vscode.workspace.workspaceFolders;
         if (workspaceFolders && workspaceFolders.length > 0) {
@@ -181,9 +209,6 @@ class ChatPanelProvider {
             });
         }
     }
-    newConversation() {
-        this._handleNewConversation();
-    }
     _postMessage(message) {
         if (this._view) {
             this._view.webview.postMessage(message);
@@ -191,43 +216,68 @@ class ChatPanelProvider {
     }
     _getHtmlForWebview(webview) {
         const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this._context.extensionUri, 'media', 'main.js'));
-        const stylesResetUri = webview.asWebviewUri(vscode.Uri.joinPath(this._context.extensionUri, 'media', 'reset.css'));
         const stylesMainUri = webview.asWebviewUri(vscode.Uri.joinPath(this._context.extensionUri, 'media', 'main.css'));
         const nonce = this._getNonce();
         return `<!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
+			<html lang="en">
+			<head>
+				<meta charset="UTF-8">
                 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <link href="${stylesResetUri}" rel="stylesheet">
+				<meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <link href="${stylesMainUri}" rel="stylesheet">
-                <title>AI Context Builder</title>
-            </head>
-            <body>
-                <div class="chat-container">
-                    <div class="info-section">
-                        <p>📝 Build context with text and attachments.</p>
-                        <p>📋 Click "Copy Context" to send to the main chat.</p>
+				<title>AI Chat</title>
+			</head>
+			<body>
+                <div class="container">
+                    <div class="language-selector">
+                        <label>Language:</label>
+                        <button class="lang-btn active">English</button>
                     </div>
 
-                    <div class="attachments-section">
-                        <div class="attachment-buttons">
-                            <button id="attachFileBtn" class="attach-btn">Attach File/Folder</button>
+                    <p class="info-text">Type your message and press 'Send' or Ctrl+Enter to send. You can also attach files.</p>
+
+                    <textarea id="message-input" class="message-input" placeholder="hello i am your pair programmer, this is what your ai_extension_tool user interface is supposed to look like view the attached image:" aria-label="Message Input"></textarea>
+
+                    <div class="buttons-container">
+                        <div class="file-buttons">
+                            <button id="attach-file-btn" class="btn" aria-label="Attach file or folder">Attach file</button>
+                            <button id="clear-selected-btn" class="btn" aria-label="Clear selected files">Clear Selected</button>
+                            <button id="clear-all-btn" class="btn" aria-label="Clear all attachments">Clear All</button>
                         </div>
-                        <div id="attachmentsList" class="attachments-list"></div>
+                        <div class="image-buttons">
+                            <button id="attach-image-btn" class="btn" aria-label="Attach an image">Attach Image</button>
+                            <button id="clear-images-btn" class="btn" aria-label="Clear all image attachments">Clear Images</button>
+                            <button id="save-image-btn" class="btn" aria-label="Save attached image">Save Image</button>
+                        </div>
                     </div>
 
-                    <div class="input-section">
-                        <textarea id="messageInput" placeholder="Type your message..." rows="4"></textarea>
-                        <button id="sendBtn" class="send-btn">Copy Context</button>
+                    <div class="drop-zones-container">
+                        <div id="file-drop-zone" class="drop-zone" role="button" aria-label="Attach files and folders drop zone">
+                            <span>Drag & drop files/folders here or click 'Attach File' button</span>
+                            <div id="file-list" class="attachment-list"></div>
+                        </div>
+                        <div id="image-drop-zone" class="drop-zone image-drop-zone" role="button" aria-label="Attach images drop zone">
+                            <span>Drag & drop images here or click here to select images</span>
+                            <div id="image-list" class="attachment-list"></div>
+                        </div>
                     </div>
 
-                    <div id="statusArea" class="status-area"></div>
+                    <div class="continue-container">
+                        <input type="checkbox" id="continue-checkbox" />
+                        <label for="continue-checkbox">Continue conversation</label>
+                    </div>
+                    
+                    <p class="note-text">NOTE: If continue conversation is checked, Agent MUST call this tool again!</p>
+
+                    <div class="bottom-buttons">
+                        <button id="send-btn" class="btn send-btn" aria-label="Send message to AI">Send</button>
+                        <button id="close-btn" class="btn close-btn" aria-label="Close extension panel">Close</button>
+                    </div>
                 </div>
-                <script nonce="${nonce}" src="${scriptUri}"></script>
-            </body>
-            </html>`;
+
+				<script nonce="${nonce}" src="${scriptUri}"></script>
+			</body>
+			</html>`;
     }
     _getNonce() {
         let text = '';
@@ -236,6 +286,15 @@ class ChatPanelProvider {
             text += possible.charAt(Math.floor(Math.random() * possible.length));
         }
         return text;
+    }
+    newConversation() {
+        this._lastMessage = '';
+        this._continueChat = false;
+        this._fileManager.clearAllAttachments();
+        // This will send the empty attachments list and the restored (empty) state
+        this.updateAttachments();
+        this.restoreState();
+        vscode.window.showInformationMessage('New conversation started.');
     }
 }
 exports.ChatPanelProvider = ChatPanelProvider;

@@ -42,7 +42,7 @@ from .ui import (
     ImageAttachmentWidget,
     DragDropImageWidget,
     get_main_stylesheet,
-    get_file_dialog_stylesheet
+    get_file_list_stylesheet
 )
 
 # Utilities
@@ -80,7 +80,7 @@ __all__ = [
     'ImageAttachmentWidget',
     'DragDropImageWidget',
     'get_main_stylesheet',
-    'get_file_dialog_stylesheet',
+    'get_file_list_stylesheet',
     
     # Utils
     'get_translations',

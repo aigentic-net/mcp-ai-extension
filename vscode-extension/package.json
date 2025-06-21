@@ -28,6 +28,7 @@
     "onView:aiextensionChat"
   ],
   "main": "./out/extension.js",
+  "l10n": "./l10n",
   "contributes": {
     "commands": [
       {
@@ -128,6 +129,11 @@
     "configuration": {
       "title": "AI extension",
       "properties": {
+        "aiextension.mcpToolName": {
+          "type": "string",
+          "default": "mcp_ai-extension_ai_extension_tool",
+          "description": "The exact name of the MCP tool to call for AI interactions."
+        },
         "aiextension.autoAttachOpenFiles": {
           "type": "boolean",
           "default": false,

@@ -504,7 +504,7 @@ def get_main_input_textedit_stylesheet():
             background-color: #2d2d2d;
             color: #ffffff;
             border: 1px solid #3d3d3d;
-            border-radius: 4px;
+        border-radius: 4px;
             padding: 8px;
             font-size: 14px;
             selection-background-color: #264f78;
@@ -561,7 +561,7 @@ def get_file_list_stylesheet():
         QListWidget::item:hover {
             background-color: #3d3d3d;
         }
-    """
+        """ 
 
 def get_context_menu_stylesheet():
     """Get context menu stylesheet"""
@@ -1043,5 +1043,5 @@ def get_image_viewer_close_button_stylesheet():
             background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
                 stop:0 #e53e3e, stop:1 #c53030);
             transform: translateY(0px);
-        }
+    }
     """ 

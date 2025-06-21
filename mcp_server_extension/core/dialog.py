@@ -296,7 +296,7 @@ class InputDialog(QtWidgets.QDialog):
         file_layout.addWidget(self.file_drop_area)
         
         return file_widget
-
+    
     def _create_image_attachment_section(self):
         """Create image attachment section"""
         image_widget = QtWidgets.QWidget()
@@ -471,7 +471,7 @@ class InputDialog(QtWidgets.QDialog):
         self.file_list.customContextMenuRequested.connect(self.show_context_menu)
         self.file_list.itemSelectionChanged.connect(self.update_clear_buttons_state)
         self.layout.addWidget(self.file_list)
-
+    
     def _setup_shadow_effect(self):
         """Thiết lập hiệu ứng đổ bóng"""
         shadow = QtWidgets.QGraphicsDropShadowEffect(self)
@@ -828,7 +828,6 @@ class InputDialog(QtWidgets.QDialog):
         self.result_text = text
         self.result_continue = continue_chat
         self.result_ready = True
-        
         # Close dialog
         self.accept()
     

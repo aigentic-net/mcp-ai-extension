@@ -7,7 +7,7 @@ from .core import AI_EXTENSION_tool, get_tool_description
 def create_server():
     """Create and configure the MCP server instance"""
     mcp = FastMCP("AI extension Extension")
-    mcp.add_tool(AI_EXTENSION_tool, name="AI_EXTENSION_tool", description=get_tool_description())
+    mcp.add_tool(AI_EXTENSION_tool, name="mcp_ai-extension_ai_extension_tool", description=get_tool_description())
     return mcp
 
 def main():

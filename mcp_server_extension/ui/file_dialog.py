@@ -2,7 +2,7 @@
 from PyQt5 import QtWidgets, QtCore
 import os
 from .file_tree import FileTreeView, FileTreeDelegate
-from .styles import get_file_dialog_stylesheet, get_context_menu_stylesheet, ModernTheme
+from .styles import get_file_list_stylesheet, get_context_menu_stylesheet, ModernTheme
 from ..utils.translations import get_translation
 from ..constants import DEFAULT_PATH
 from ..utils.file_utils import (
@@ -202,7 +202,7 @@ class FileAttachDialog(QtWidgets.QDialog):
         layout.addLayout(buttons_layout)
         
         # Áp dụng stylesheet
-        self.setStyleSheet(get_file_dialog_stylesheet())
+        self.setStyleSheet(get_file_list_stylesheet())
         
         # Force refresh styles cho tất cả buttons để apply semantic colors
         self._refresh_button_styles()

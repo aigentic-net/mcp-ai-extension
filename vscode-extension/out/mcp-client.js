@@ -23,48 +23,40 @@ class MCPClient {
             throw new Error('MCP client not initialized');
         }
         try {
-            // Format the message according to the AI extension Tool specification
-            let formattedMessage = message;
-            // Add attached files section if there are any
-            if (attachedFiles.length > 0) {
-                formattedMessage += '\n\n<AI_EXTENSION_ATTACHED_FILES>\n';
-                const folders = attachedFiles.filter(f => f.type === 'folder');
-                const files = attachedFiles.filter(f => f.type === 'file');
-                if (folders.length > 0) {
-                    formattedMessage += 'FOLDERS:\n';
-                    folders.forEach(folder => {
-                        formattedMessage += `- ${folder.relativePath}\n`;
-                    });
-                    formattedMessage += '\n';
-                }
-                if (files.length > 0) {
-                    formattedMessage += 'FILES:\n';
-                    files.forEach(file => {
-                        formattedMessage += `- ${file.relativePath}\n`;
-                    });
-                    formattedMessage += '\n';
-                }
-                formattedMessage += '</AI_EXTENSION_ATTACHED_FILES>\n\n';
-                // Add workspace information
-                const workspace = this.getCurrentWorkspace();
-                if (workspace) {
-                    const workspaceName = workspace.split('/').pop() || 'workspace';
-                    formattedMessage += `<AI_EXTENSION_WORKSPACE>${workspaceName}</AI_EXTENSION_WORKSPACE>\n`;
-                }
+            const config = vscode.workspace.getConfiguration('aiextension');
+            const command = config.get('mcpToolName', 'mcp_ai-extension_ai_extension_tool');
+            const args = {
+                message: message,
+                attached_files: attachedFiles.map(f => f.fullPath),
+                attached_images: attachedImages.map(img => ({
+                    path: img.path,
+                    base64: img.base64,
+                    mediaType: img.mediaType
+                })),
+                workspace: this.getCurrentWorkspace(),
+                continue_chat: continueChat,
+            };
+            const result = await vscode.commands.executeCommand(command, args);
+            if (typeof result === 'string') {
+                return result;
             }
-            // Add continue chat flag
-            formattedMessage += `<AI_EXTENSION_CONTINUE_CHAT>${continueChat}</AI_EXTENSION_CONTINUE_CHAT>\n`;
-            // Use the MCP AI_EXTENSION_tool that's available through the ai-extension server
-            // The tool will process the message and return a formatted response
-            return new Promise((resolve) => {
-                // Simulate processing delay
-                setTimeout(() => {
-                    resolve("Extension: Message formatted and ready! The AI_EXTENSION_tool from ai-extension server will process this through the MCP protocol.");
-                }, 1000);
-            });
+            if (typeof result === 'object' && result !== null && 'error' in result) {
+                const errorResult = result;
+                throw new Error(`Tool returned an error: ${errorResult.error}`);
+            }
+            throw new Error(`Received unexpected response type from tool: ${typeof result}`);
         }
         catch (error) {
-            throw new Error(`Failed to send message to MCP server: ${error}`);
+            console.error(`Failed to execute MCP tool call: ${error}`);
+            if (error instanceof Error) {
+                if (error.message.includes('not found')) {
+                    const toolName = vscode.workspace.getConfiguration('aiextension').get('mcpToolName');
+                    vscode.window.showErrorMessage(`AI tool '${toolName}' not found. Please ensure the MCP server is running and the tool is correctly registered.`);
+                    throw new Error(`Configured AI tool not found: ${toolName}`);
+                }
+                throw new Error(`Failed to send message to MCP server: ${error.message}`);
+            }
+            throw new Error(`Failed to send message to MCP server: Unknown error`);
         }
     }
     getCurrentWorkspace() {

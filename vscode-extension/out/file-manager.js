@@ -10,6 +10,10 @@ class FileManager {
         this.attachedImages = [];
         this.context = context;
     }
+    dispose() {
+        this.clearAllAttachments();
+        console.log("FileManager disposed and attachments cleared.");
+    }
     attachFile(filePath) {
         try {
             const stat = fs.statSync(filePath);
@@ -21,7 +25,8 @@ class FileManager {
             const attachedFile = {
                 path: filePath,
                 relativePath: relativePath,
-                type: stat.isDirectory() ? 'folder' : 'file'
+                type: stat.isDirectory() ? 'folder' : 'file',
+                fullPath: filePath
             };
             // Check if already attached
             const exists = this.attachedFiles.some(f => f.path === filePath);
@@ -77,6 +82,13 @@ class FileManager {
             return true;
         }
         return false;
+    }
+    clearSelectedFiles(filesToClear) {
+        const pathsToClear = new Set(filesToClear.map(f => f.path));
+        this.attachedFiles = this.attachedFiles.filter(f => !pathsToClear.has(f.path));
+    }
+    clearImages() {
+        this.attachedImages = [];
     }
     clearAllAttachments() {
         this.attachedFiles = [];
