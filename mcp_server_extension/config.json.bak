@@ -1,0 +1,18 @@
+{
+  "language": "en",
+  "window_size": {
+    "width": 836,
+    "height": 706
+  },
+  "ui_preferences": {
+    "continue_chat_default": true,
+    "remember_last_path": true,
+    "auto_expand_folders": true
+  },
+  "last_attached_images": [],
+  "last_workspace": {
+    "path": "/Users/hildarayan/Projects/mcp-ai-extension",
+    "name": "mcp-ai-extension",
+    "attached_files": []
+  }
+}

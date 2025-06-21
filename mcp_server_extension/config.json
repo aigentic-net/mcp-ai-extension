@@ -1,0 +1,27 @@
+{
+  "language": "en",
+  "window_size": {
+    "width": 836,
+    "height": 706
+  },
+  "ui_preferences": {
+    "continue_chat_default": true,
+    "remember_last_path": true,
+    "auto_expand_folders": true
+  },
+  "last_attached_images": [
+    {
+      "db_path": "/Users/hildarayan/Projects/mcp-ai-extension/user_images/pasted_b579c171.png",
+      "filename": "pasted_b579c171.png",
+      "media_type": "image/png",
+      "source_type": "pasted",
+      "db_filename": "pasted_b579c171.png",
+      "relative_db_path": "pasted_b579c171.png"
+    }
+  ],
+  "last_workspace": {
+    "path": "/Users/hildarayan/Projects/mcp-ai-extension",
+    "name": "mcp-ai-extension",
+    "attached_files": []
+  }
+}

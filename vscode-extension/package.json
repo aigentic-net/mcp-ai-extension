@@ -1,0 +1,168 @@
+{
+  "name": "ai-extension-vscode",
+  "displayName": "AI extension",
+  "description": "Rich AI interaction with file and image attachments, powered by MCP",
+  "version": "0.1.0",
+  "publisher": "ai-extension",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/mcp-ai-extension.git"
+  },
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "AI",
+    "Chat",
+    "Other"
+  ],
+  "keywords": [
+    "ai",
+    "chat",
+    "assistant",
+    "mcp",
+    "files",
+    "images"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "aiextension.openChat",
+        "title": "Open AI Chat",
+        "category": "AI extension",
+        "icon": "$(comment-discussion)"
+      },
+      {
+        "command": "aiextension.attachFile",
+        "title": "Attach File to AI Chat",
+        "category": "AI extension",
+        "icon": "$(file-add)"
+      },
+      {
+        "command": "aiextension.attachCurrentFile",
+        "title": "Attach Current File to AI Chat",
+        "category": "AI extension",
+        "icon": "$(file)"
+      },
+      {
+        "command": "aiextension.newConversation",
+        "title": "New AI Conversation",
+        "category": "AI extension",
+        "icon": "$(add)"
+      },
+      {
+        "command": "aiextension.clearAttachments",
+        "title": "Clear All Attachments",
+        "category": "AI extension",
+        "icon": "$(clear-all)"
+      }
+    ],
+    "views": {
+      "aiextension": [
+        {
+          "id": "aiextensionChat",
+          "name": "AI Chat"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "aiextension",
+          "title": "AI extension",
+          "icon": "$(robot)"
+        }
+      ]
+    },
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "aiextension.attachFile",
+          "group": "aiextension",
+          "when": "explorerResourceIsFile"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "aiextension.attachCurrentFile",
+          "group": "aiextension",
+          "when": "editorTextFocus"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "aiextension.openChat"
+        },
+        {
+          "command": "aiextension.attachFile",
+          "when": "false"
+        },
+        {
+          "command": "aiextension.attachCurrentFile"
+        },
+        {
+          "command": "aiextension.newConversation"
+        },
+        {
+          "command": "aiextension.clearAttachments"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "aiextension.newConversation",
+          "when": "view == aiextensionChat",
+          "group": "navigation"
+        },
+        {
+          "command": "aiextension.clearAttachments",
+          "when": "view == aiextensionChat",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "AI extension",
+      "properties": {
+        "aiextension.autoAttachOpenFiles": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically suggest open files for attachment"
+        },
+        "aiextension.maxFileSize": {
+          "type": "number",
+          "default": 1048576,
+          "description": "Maximum file size in bytes for attachment (default: 1MB)"
+        },
+        "aiextension.enableImages": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable image attachment support"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "16.x",
+    "@types/vscode": "^1.74.0",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "@vscode/test-electron": "^2.2.0",
+    "@vscode/vsce": "^3.5.0",
+    "eslint": "^8.28.0",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {}
+}

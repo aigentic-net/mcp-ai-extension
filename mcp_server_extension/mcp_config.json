@@ -1,0 +1,11 @@
+{
+  "server_name": "AI extension Extension",
+  "description": "AI extension Tool MCP Server - Extension Version",
+  "tools": [
+    {
+      "name": "ai_extension_extension_tool",
+      "description": "Format messages with file attachments for VS Code extension"
+    }
+  ],
+  "transport": "stdio"
+}
